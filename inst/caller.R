@@ -4,16 +4,16 @@ library(flextable)
 library(default)
 library(officer)
 
-source_backbones()
+backbones <- source_backbones()
 
-package <- create_content_package(
+package_init <- create_content_package(
  start_number = list(T = 1L, F = 1L, L = 1L),
  sep_subtitle = "newline",
  sep_population = "newline",
  language = "PT-BR"
 )
 
-package <- package
+package <- run_caller_contents(package_init, backbones, )
 
 export_package(
  package = package,

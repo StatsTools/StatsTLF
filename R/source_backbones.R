@@ -24,7 +24,9 @@ source_backbones <- function(pkg_name) {
  stopifnot("Backbone folder doesn't exist." = dir.exists(backbone_path))
 
  files.sources = list.files(backbone_path, full.names = TRUE)
- sapply(files.sources, source)
+ sapply(files.sources, source, local = environment())
 
- return(backbone_path)
+ backbones <- mget(ls(pattern = "table_|figure_|listing_"))
+
+ return(backbones)
 }

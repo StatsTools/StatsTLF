@@ -9,6 +9,7 @@ export(create_package_structure)
 export(create_project)
 export(export_package)
 export(fig_display)
+export(run_caller_contents)
 export(source_backbones)
 
 importFrom(methods,new)

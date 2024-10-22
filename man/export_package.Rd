@@ -7,7 +7,7 @@
 export_package(
   package,
   report_name,
-  template_path = "./00_Template/template_PT-BR.docx",
+  template_name = "template_PT-BR.docx",
   supp = FALSE
 )
 }
@@ -16,7 +16,7 @@ export_package(
 
 \item{report_name}{A character name to the exported file.}
 
-\item{template_path}{A character with path to the template report file.}
+\item{template_name}{A character with the name to the template report file in folder ./00_Template.}
 
 \item{supp}{A boolean to specify if 'S' should be added before content number in export.}
 }
