@@ -32,11 +32,26 @@ setMethod('create_content_method', 'ContentBackbone', function(x, value, subtitl
 
 # S4 Class 'Content' -----------------------------------------------------------
 
-setOldClass('flextable')
-setOldClass('gg')
-setOldClass('tbl_df')
-setOldClass('gtable')
-setClassUnion('flextableORggORtbl_dfORgtable', c('flextable', 'gg', 'tbl_df', 'gtable'))
+if (is.null(getClassDef("flextable"))) {
+  setOldClass('flextable')
+}
+
+if (is.null(getClassDef("gg"))) {
+  setOldClass("gg")
+}
+
+if (is.null(getClassDef("tbl_df"))) {
+  setOldClass('tbl_df')
+}
+
+if (is.null(getClassDef("gtable"))) {
+  setOldClass("gtable")
+}
+
+if (is.null(getClassDef("flextableORggORtbl_dfORgtable"))) {
+  setClassUnion('flextableORggORtbl_dfORgtable', c('flextable', 'gg', 'tbl_df', 'gtable'))
+}
+
 
 setClass(
  'Content',
