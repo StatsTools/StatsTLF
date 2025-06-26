@@ -20,6 +20,9 @@ export_package(
 
 \item{supp}{A boolean to specify if 'S' should be added before content number in export.}
 }
+\value{
+A path to the report file.
+}
 \description{
 Export package
 }

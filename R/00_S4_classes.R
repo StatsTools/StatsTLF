@@ -247,13 +247,22 @@ setMethod('export_package_method', 'ContentPackage', function(x, report_name, te
    doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
   }
  }
- print(doc, target = paste0(output$dir, '/', report_name, '.docx'))
+ print(doc, target = paste0(output$dir, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'))
 
- output$files <- list.files(output$dir)
+ unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
+ dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
 
- zip::zip(paste0(zipfolder, '/', report_name, '.zip'), files = output$files, root = output$dir)
+ files_to_copy <- list.files(output$dir, full.names = TRUE)
+ file.copy(from = files_to_copy, to = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), overwrite = TRUE, recursive = FALSE, copy.mode = TRUE)
+ Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), mode = "0444", use_umask = FALSE)
+
+ # Zip file will no longer be used.
+ # output$files <- list.files(output$dir)
+ # zip::zip(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.zip'), files = output$files, root = output$dir)
 
  cat('  Done!\n')
 
- return(paste0(zipfolder, '/', report_name, '.zip'))
+ cat(paste0('\n\n Report avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
+
+ return(invisible(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"))))
 })

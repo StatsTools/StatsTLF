@@ -64,7 +64,7 @@ create_backbone_structure <- function(backbone_name, backbone_type, pkg_name) {
  file.rename(paste0(backbone_path, '\\backbone.R'), paste0(backbone_path, "\\", backbone_text, '.R'))
 
  backbone <- readLines(paste0(backbone_path, "\\", backbone_text, '.R'))
- backbone[1] <- paste0(backbone_text, ' <- create_content_backbone(title = "", type = "', backbone_type, '", fun = function(dataset, ...) {')
+ backbone[1] <- paste0(backbone_text, ' <- StatsTLF::create_content_backbone(title = "", type = "', backbone_type, '", fun = function(dataset, ...) {')
  backbone[12] <- paste0(' return(', backbone_return_text, ')')
  write(backbone, file = paste0(backbone_path, "\\", backbone_text, '.R'))
 

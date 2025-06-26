@@ -4,10 +4,12 @@
 \alias{create_package_structure}
 \title{Create package structure folder}
 \usage{
-create_package_structure(pkg_name)
+create_package_structure(pkg_name, dataset = FALSE)
 }
 \arguments{
 \item{pkg_name}{A character to specify the name of the package.}
+
+\item{dataset}{A boolean to specify if the package is a dataset package, not a report.}
 }
 \value{
 A path to the package structure folder

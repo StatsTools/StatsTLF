@@ -13,11 +13,7 @@ package_init <- StatsTLF::create_content_package(
 
 package <- StatsTLF::run_caller_contents(package_init, )
 
-StatsTLF::export_package(
- package = package,
- report_name = 'SAR', # Please, do not change report name.
- template_name = "template_PT-BR.docx",
- supp = FALSE
-)
+saveRDS(package@content_list, paste0('./04_Datasets/Datasets', , '.RDS'))
+Sys.chmod(paste0(here::here('04_Datasets'), '/Datasets - ', , '.RDS'), mode = "0444", use_umask = FALSE)
 
 rm(list = ls())

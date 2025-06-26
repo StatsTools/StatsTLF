@@ -5,7 +5,7 @@
 #' @param template_name A character with the name to the template report file in folder ./00_Template.
 #' @param supp A boolean to specify if 'S' should be added before content number in export.
 #'
-#' @return NULL
+#' @return A path to the report file.
 #' @export
 #'
 #' @examples

@@ -4,12 +4,10 @@
 \alias{run_caller_contents}
 \title{Run contents from caller_contents file}
 \usage{
-run_caller_contents(package, backbones, pkg_name)
+run_caller_contents(package, pkg_name)
 }
 \arguments{
 \item{package}{An object with class ContentPackage.}
-
-\item{backbones}{A list of backbones.}
 
 \item{pkg_name}{A character with the package name.}
 }
@@ -20,5 +18,5 @@ A package with content added.
 Run contents from caller_contents file
 }
 \examples{
-x <- run_caller_contents(package_init, backbones, 'name of the package')
+x <- run_caller_contents(package_init, 'name of the package')
 }
