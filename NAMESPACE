@@ -12,6 +12,7 @@ export(export_package)
 export(fig_display)
 export(run_caller_contents)
 export(source_backbones)
+export(validate_hash)
 
 importFrom(methods,new)
 importFrom(utils,choose.dir)
