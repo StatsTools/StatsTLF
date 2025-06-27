@@ -1,4 +1,4 @@
-#' Build report file with log for submission
+#' Build a file with log for submission
 #'
 #' @param pkg_name A character to specify the name of the package.
 #' @param dataset A boolean to specify if the package is a dataset package, not a report.
@@ -7,8 +7,8 @@
 #' @export
 #'
 #' @examples
-#' x <- build_report('Teste')
-build_report <- function(pkg_name, dataset = FALSE) {
+#' x <- build_submission('Teste')
+build_submission <- function(pkg_name, dataset = FALSE) {
 
   # Validation Step -------------------------------------------------------------
   stopifnot(
