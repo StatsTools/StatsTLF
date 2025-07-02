@@ -118,6 +118,8 @@ build_submission <- function(pkg_name, dataset = FALSE) {
     Sys.chmod(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), mode = "0444", use_umask = FALSE)
   }
 
+  cat('\nLog file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
+
 
   return(invisible(paste0(here::here('05_Results'), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log')))
 }
