@@ -108,6 +108,8 @@ build_submission <- function(pkg_name, dataset = FALSE) {
               paste0(here::here('04_Datasets'), '/Datasets Log File - ', pkg_name, '.log'),
               overwrite = TRUE)
     Sys.chmod(paste0(here::here('04_Datasets'), '/Datasets Log File - ', pkg_name, '.log'), mode = "0444", use_umask = FALSE)
+
+    cat('\nLog file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, '.RDS'), warn = FALSE)))
   } else {
     write(paste0('Log name: SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), file = log_file, append = TRUE)
     write(paste0('Log path: ', here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d")), file = log_file, append = TRUE)
@@ -116,10 +118,9 @@ build_submission <- function(pkg_name, dataset = FALSE) {
               paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
               overwrite = TRUE)
     Sys.chmod(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), mode = "0444", use_umask = FALSE)
+
+    cat('\nLog file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
   }
-
-  cat('\nLog file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
-
 
   return(invisible(paste0(here::here('05_Results'), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log')))
 }
