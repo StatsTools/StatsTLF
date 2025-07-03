@@ -20,7 +20,7 @@ caller_contents <- function(package, backbones) {
     # )
   )
 
-  package <- purrr::reduce(contents, add_to_package, .init = package)
+  package <- purrr::reduce(contents, StatsTLF::add_to_package, .init = package)
 
   return(package)
 }
