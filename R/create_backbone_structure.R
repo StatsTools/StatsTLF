@@ -64,21 +64,21 @@ create_backbone_structure <- function(backbone_name, backbone_type, pkg_name) {
  file.rename(paste0(backbone_path, '\\backbone.R'), paste0(backbone_path, "\\", backbone_text, '.R'))
 
  backbone <- readLines(paste0(backbone_path, "\\", backbone_text, '.R'))
- backbone[27] <- paste0(backbone_text, ' <- StatsTLF::create_content_backbone(title = "", type = "', backbone_type, '", fun = function(dataset, ...) {')
+ backbone[28] <- paste0(backbone_text, ' <- StatsTLF::create_content_backbone(title = "", type = "', backbone_type, '", fun = function(dataset, ...) {')
  backbone[67] <- paste0(' return(', backbone_return_text, ')')
 
  if (backbone_type == 'T') {
    backbone[1] <- "#' Title: Create Table – XXXXXXXXXX"
    backbone[15] <- "#'   - A flextable object containing the summary table."
-   backbone[25] <- "#' @return flextable object"
+   backbone[26] <- "#' @return flextable object"
  } else if (backbone_type == 'F') {
    backbone[1] <- "#' Title: Create Figure – XXXXXXXXXX"
    backbone[15] <- "#'   - A ggplot object containing the summary figure."
-   backbone[25] <- "#' @return ggplot object"
+   backbone[26] <- "#' @return ggplot object"
  } else if (backbone_type == 'L') {
    backbone[1] <- "#' Title: Create Listing – XXXXXXXXXX"
    backbone[15] <- "#'   - A tibble object containing the summary listing."
-   backbone[25] <- "#' @return tibble object"
+   backbone[26] <- "#' @return tibble object"
  }
 
  write(backbone, file = paste0(backbone_path, "\\", backbone_text, '.R'))
