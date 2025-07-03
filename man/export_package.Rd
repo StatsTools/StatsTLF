@@ -8,7 +8,8 @@ export_package(
   package,
   report_name,
   template_name = "template_PT-BR.docx",
-  supp = FALSE
+  supp = FALSE,
+  dataset = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ export_package(
 \item{template_name}{A character with the name to the template report file in folder ./00_Template.}
 
 \item{supp}{A boolean to specify if 'S' should be added before content number in export.}
+
+\item{dataset}{A boolean to specify if export is a dataset type and not a report.}
 }
 \value{
 A path to the report file.

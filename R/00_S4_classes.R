@@ -199,70 +199,82 @@ setMethod('add_to_package_method', 'ContentPackage', function(x, content) {
  return(x)
 })
 
-setGeneric('export_package_method', function(x, report_name, template_name, supp = FALSE) standardGeneric('export_package_method'))
-setMethod('export_package_method', 'ContentPackage', function(x, report_name, template_name, supp = FALSE) {
+setGeneric('export_package_method', function(x, report_name, template_name, supp = FALSE, dataset = FALSE) standardGeneric('export_package_method'))
+setMethod('export_package_method', 'ContentPackage', function(x, report_name, template_name, supp = FALSE, dataset = FALSE) {
 
  cat('  Exporting content package:\n')
 
- zipfolder <- here::here('05_Results')
+ if (dataset) {
+   zipfolder <- here::here('04_Datasets')
 
- output <- list(
-  dir = tempfile(pattern = format(Sys.time(), "%Y_%m_%d_%H_%M_%S_"))
- )
- dir.create(output$dir)
+   unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
+   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
 
- types <- sapply(x@content_list, function(x) return(x@type))
- sections <- sapply(x@content_list, function(x) return(x@section))
- sections_levels <- unique(sections)
+   saveRDS(x@content_list, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), ".RDS"))
+   Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), ".RDS"), mode = "0444")
 
- content_numbers <- tibble::tibble(ID = seq(1, length(x@content_list)), type = factor(types, levels = c('T', 'F', 'L')), section = factor(sections, levels = sections_levels)) |>
-  dplyr::group_by(type) |>
-  dplyr::group_split() |>
-  lapply(function(type_data) {
-   if (unique(type_data$type) == 'T') start <- x@start_number$T
-   else if (unique(type_data$type) == 'F') start <- x@start_number$F
-   else if (unique(type_data$type) == 'L') start <- x@start_number$L
+   cat('  Done!\n')
 
-   type_data |>
-    dplyr::mutate(number = seq(start, start + dplyr::n() - 1))
-  }) |>
-  purrr::reduce(dplyr::bind_rows) |>
-  dplyr::mutate(last = ID == dplyr::n()) |>
-  dplyr::arrange(ID)
+   cat(paste0('\n\n Datasets avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
 
- sections_start <- content_numbers |>
-  dplyr::group_by(section) |>
-  dplyr::summarise(section_start = min(ID))
+ } else {
+   zipfolder <- here::here('05_Results')
 
- template_path <- paste0(here::here('00_Template'), '\\', template_name)
+   output <- list(
+     dir = tempfile(pattern = format(Sys.time(), "%Y_%m_%d_%H_%M_%S_"))
+   )
+   dir.create(output$dir)
 
- doc <- officer::read_docx(path = template_path) |>
-   officer::body_add_toc() |>
-   officer::body_add_break()
- for (i in seq(1, length(x@content_list))) {
-  if (i %in% c(sections_start$section_start)) {
-   if (!is.na(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section))) doc <- officer::body_add_fpar(doc, officer::fpar(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section)), style = 'StatsTLF T\u00edtulo 1')
-   doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
-  } else {
-   doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
-  }
+   types <- sapply(x@content_list, function(x) return(x@type))
+   sections <- sapply(x@content_list, function(x) return(x@section))
+   sections_levels <- unique(sections)
+
+   content_numbers <- tibble::tibble(ID = seq(1, length(x@content_list)), type = factor(types, levels = c('T', 'F', 'L')), section = factor(sections, levels = sections_levels)) |>
+     dplyr::group_by(type) |>
+     dplyr::group_split() |>
+     lapply(function(type_data) {
+       if (unique(type_data$type) == 'T') start <- x@start_number$T
+       else if (unique(type_data$type) == 'F') start <- x@start_number$F
+       else if (unique(type_data$type) == 'L') start <- x@start_number$L
+
+       type_data |>
+         dplyr::mutate(number = seq(start, start + dplyr::n() - 1))
+     }) |>
+     purrr::reduce(dplyr::bind_rows) |>
+     dplyr::mutate(last = ID == dplyr::n()) |>
+     dplyr::arrange(ID)
+
+   sections_start <- content_numbers |>
+     dplyr::group_by(section) |>
+     dplyr::summarise(section_start = min(ID))
+
+   template_path <- paste0(here::here('00_Template'), '\\', template_name)
+
+   doc <- officer::read_docx(path = template_path) |>
+     officer::body_add_toc() |>
+     officer::body_add_break()
+   for (i in seq(1, length(x@content_list))) {
+     if (i %in% c(sections_start$section_start)) {
+       if (!is.na(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section))) doc <- officer::body_add_fpar(doc, officer::fpar(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section)), style = 'StatsTLF T\u00edtulo 1')
+       doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
+     } else {
+       doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
+     }
+   }
+   print(doc, target = paste0(output$dir, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'))
+
+   unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
+   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
+
+   files_to_copy <- list.files(output$dir, full.names = TRUE)
+   file.copy(from = files_to_copy, to = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), overwrite = TRUE, recursive = FALSE, copy.mode = TRUE)
+   Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), mode = "0444", use_umask = FALSE)
+
+   cat('  Done!\n')
+
+   cat(paste0('\n\n Report avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
+
  }
- print(doc, target = paste0(output$dir, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'))
-
- unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
- dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
-
- files_to_copy <- list.files(output$dir, full.names = TRUE)
- file.copy(from = files_to_copy, to = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), overwrite = TRUE, recursive = FALSE, copy.mode = TRUE)
- Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), mode = "0444", use_umask = FALSE)
-
- # Zip file will no longer be used.
- # output$files <- list.files(output$dir)
- # zip::zip(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.zip'), files = output$files, root = output$dir)
-
- cat('  Done!\n')
-
- cat(paste0('\n\n Report avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
 
  return(invisible(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"))))
 })

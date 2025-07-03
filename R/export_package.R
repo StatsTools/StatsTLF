@@ -4,6 +4,7 @@
 #' @param report_name A character name to the exported file.
 #' @param template_name A character with the name to the template report file in folder ./00_Template.
 #' @param supp A boolean to specify if 'S' should be added before content number in export.
+#' @param dataset A boolean to specify if export is a dataset type and not a report.
 #'
 #' @return A path to the report file.
 #' @export
@@ -24,7 +25,7 @@
 #'   )
 #' ) |>
 #' export_package('teste')
-export_package <- function(package, report_name, template_name = "template_PT-BR.docx", supp = FALSE) {
+export_package <- function(package, report_name, template_name = "template_PT-BR.docx", supp = FALSE, dataset = FALSE) {
 
  # Validation Step -------------------------------------------------------------
  stopifnot(
@@ -49,9 +50,24 @@ export_package <- function(package, report_name, template_name = "template_PT-BR
  )
 
  stopifnot(
-   "Folder './05_Results' doesn't exist." = dir.exists(here::here('05_Results'))
+   "`dataset` must be provided." = !is.na(dataset),
+   "`dataset` must be a boolean." = is.logical(dataset),
+   "`dataset` cannot be an array." = length(dataset) == 1
  )
+
+ if (dataset) {
+   stopifnot(
+     "Folder './04_Datasets' doesn't exist." = dir.exists(here::here('04_Datasets'))
+   )
+ } else {
+   stopifnot(
+     "Folder './05_Results' doesn't exist." = dir.exists(here::here('05_Results'))
+   )
+ }
+
+ stopifnot("Package must contain at least one content to be exported." = length(package@content_list) > 0)
+
  # -----------------------------------------------------------------------------
 
- return(export_package_method(x = package, report_name = report_name, template_name = template_name, supp = supp))
+ return(export_package_method(x = package, report_name = report_name, template_name = template_name, supp = supp, dataset = dataset))
 }

@@ -24,15 +24,9 @@ create_package_structure <- function(pkg_name, dataset = FALSE) {
 
  template_dir <- system.file("", package = "StatsTLF")
 
- if (dataset) {
-   template_path <- paste0(template_dir, '\\caller_datasets.R')
-   file.copy(template_path, paste0(path, '\\caller.R'))
-   file.rename(paste0(path, '\\caller.R'), paste0(path, "\\caller_", pkg_name, '.R'))
- } else {
-   template_path <- paste0(template_dir, '\\caller.R')
-   file.copy(template_path, paste0(path, '\\caller.R'))
-   file.rename(paste0(path, '\\caller.R'), paste0(path, "\\caller_", pkg_name, '.R'))
- }
+ template_path <- paste0(template_dir, '\\caller.R')
+ file.copy(template_path, paste0(path, '\\caller.R'))
+ file.rename(paste0(path, '\\caller.R'), paste0(path, "\\caller_", pkg_name, '.R'))
 
  template_path2 <- paste0(template_dir, '\\caller_contents.R')
  file.copy(template_path2, paste0(path, '\\caller_contents.R'))
@@ -40,13 +34,16 @@ create_package_structure <- function(pkg_name, dataset = FALSE) {
  dir.create(paste0(path, '\\backbones'))
 
  caller <- readLines(paste0(path, "\\caller_", pkg_name, '.R'))
- caller[14] <- paste0("package <- StatsTLF::run_caller_contents(package_init, '", pkg_name, "')")
+ caller[10] <- paste0("package <- StatsTLF::run_caller_contents(package_init, '", pkg_name, "')")
 
  if (dataset) {
-   caller[16] <- paste0('saveRDS(package@content_list, "./04_Datasets/Datasets - ', pkg_name, '.RDS")')
-   caller[17] <- paste0('Sys.chmod("./04_Datasets/Datasets - ', pkg_name, '.RDS", mode = "0444")')
+   caller[14] <- paste0(" report_name = 'Datasets - ", pkg_name, "', # Please, do not change this if going to use `build_submission()`.")
+   caller[17] <- " dataset = TRUE"
+   caller <- caller[-c(15, 16)]
+   caller <- caller[-c(4:8)]
+   caller[3] <- "package_init <- StatsTLF::create_content_package()"
  } else {
-   caller[18] <- paste0(" report_name = 'SAR - ", pkg_name, "', # Please, do not change report name.")
+   caller[14] <- paste0(" report_name = 'SAR - ", pkg_name, "', # Please, do not change this if going to use `build_submission()`.")
  }
  write(caller, file = paste0(path, "\\caller_", pkg_name, '.R'))
 

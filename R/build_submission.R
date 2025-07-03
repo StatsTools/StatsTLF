@@ -101,26 +101,32 @@ build_submission <- function(pkg_name, dataset = FALSE) {
   write('--------------------------------------------------------------------------------', file = log_file, append = TRUE)
 
   if (dataset) {
-    write(paste0('Log name: Datasets Log File - ', pkg_name, '.log'), file = log_file, append = TRUE)
-    write(paste0('Log path: ', here::here('04_Datasets')), file = log_file, append = TRUE)
-    write(paste0('Datasets HashSum: ', digest::sha1(readLines(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, '.RDS'), warn = FALSE))), file = log_file, append = TRUE)
-    file.copy(paste0(output$dir, '\\SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
-              paste0(here::here('04_Datasets'), '/Datasets Log File - ', pkg_name, '.log'),
-              overwrite = TRUE)
-    Sys.chmod(paste0(here::here('04_Datasets'), '/Datasets Log File - ', pkg_name, '.log'), mode = "0444", use_umask = FALSE)
+    stopifnot('Error generating log. Please check package files.' = file.exists(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.RDS')))
 
-    cat('\nLog file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, '.RDS'), warn = FALSE)))
+    write(paste0('Log File Name: Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), file = log_file, append = TRUE)
+    write(paste0('Log Folder: ', here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d")), file = log_file, append = TRUE)
+    write(paste0('Datasets File HashSum: ', digest::sha1(readLines(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.RDS'), warn = FALSE))), file = log_file, append = TRUE)
+    file.copy(paste0(output$dir, '\\SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
+              paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
+              overwrite = TRUE)
+    Sys.chmod(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), mode = "0444")
+
+    cat('\n Log file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
+
+    return(invisible(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log')))
   } else {
-    write(paste0('Log name: SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), file = log_file, append = TRUE)
-    write(paste0('Log path: ', here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d")), file = log_file, append = TRUE)
-    write(paste0('Report HashSum: ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), warn = FALSE))), file = log_file, append = TRUE)
+    stopifnot('Error generating log. Please check package files.' = file.exists(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx')))
+
+    write(paste0('Log File Name: SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), file = log_file, append = TRUE)
+    write(paste0('Log Folder: ', here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d")), file = log_file, append = TRUE)
+    write(paste0('SAR File HashSum: ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), warn = FALSE))), file = log_file, append = TRUE)
     file.copy(paste0(output$dir, '\\SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
-              paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
+              paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
               overwrite = TRUE)
-    Sys.chmod(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), mode = "0444", use_umask = FALSE)
+    Sys.chmod(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), mode = "0444")
 
-    cat('\nLog file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
+    cat('\n Log file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
+
+  return(invisible(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log')))
   }
-
-  return(invisible(paste0(here::here('05_Results'), '/SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log')))
 }
