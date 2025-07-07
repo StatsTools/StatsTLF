@@ -199,8 +199,8 @@ setMethod('add_to_package_method', 'ContentPackage', function(x, content) {
  return(x)
 })
 
-setGeneric('export_package_method', function(x, report_name, template_name, supp = FALSE, dataset = FALSE) standardGeneric('export_package_method'))
-setMethod('export_package_method', 'ContentPackage', function(x, report_name, template_name, supp = FALSE, dataset = FALSE) {
+setGeneric('export_package_method', function(x, report_name, template_name, supp = FALSE, dataset = FALSE, add_toc = TRUE) standardGeneric('export_package_method'))
+setMethod('export_package_method', 'ContentPackage', function(x, report_name, template_name, supp = FALSE, dataset = FALSE, add_toc = TRUE) {
 
  cat('  Exporting content package:\n')
 
@@ -250,9 +250,14 @@ setMethod('export_package_method', 'ContentPackage', function(x, report_name, te
 
    template_path <- paste0(here::here('00_Template'), '\\', template_name)
 
-   doc <- officer::read_docx(path = template_path) |>
-     officer::body_add_toc() |>
-     officer::body_add_break()
+   doc <- officer::read_docx(path = template_path)
+
+   if (add_toc) {
+     doc <- doc |>
+       officer::body_add_toc() |>
+       officer::body_add_break()
+   }
+
    for (i in seq(1, length(x@content_list))) {
      if (i %in% c(sections_start$section_start)) {
        if (!is.na(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section))) doc <- officer::body_add_fpar(doc, officer::fpar(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section)), style = 'StatsTLF T\u00edtulo 1')

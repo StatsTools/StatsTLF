@@ -19,7 +19,7 @@
 #'   Step 02: Define user functions.
 #'   Step 03: Input validation (bullet proof).
 #'   Step 04: Extract relevant variables.
-#'   Step 05: Summarize data.
+#'   Step 05: Process and summarize data.
 #'   Step 06: Create output.
 #'   Step 07: Return result.
 #'
@@ -46,14 +46,14 @@ backbone <- StatsTLF::create_content_backbone(title = '', type = '', fun = funct
  # -                   Step 03: Input validation (bullet proof).               -
  # -----------------------------------------------------------------------------
 
- dataset <- StatsTLF::validate_adam_dataset(dataset, './00_Template/adam_template.xlsx')
+ stopifnot("Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(dataset, './00_Template/adam_template.xlsx'))
 
  # -----------------------------------------------------------------------------
  # -                   Step 04: Extract relevant variables.                    -
  # -----------------------------------------------------------------------------
 
  # -----------------------------------------------------------------------------
- # -                   Step 05: Summarize data.                                -
+ # -                   Step 05: Process and summarize data.                    -
  # -----------------------------------------------------------------------------
 
  # -----------------------------------------------------------------------------

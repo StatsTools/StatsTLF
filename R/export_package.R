@@ -5,8 +5,9 @@
 #' @param template_name A character with the name to the template report file in folder ./00_Template.
 #' @param supp A boolean to specify if 'S' should be added before content number in export.
 #' @param dataset A boolean to specify if export is a dataset type and not a report.
+#' @param add_toc A boolean to specify if table of contents should be added to the report.
 #'
-#' @return A path to the report file.
+#' @return A path to the exported package.
 #' @export
 #'
 #' @examples
@@ -25,7 +26,7 @@
 #'   )
 #' ) |>
 #' export_package('teste')
-export_package <- function(package, report_name, template_name = "template_PT-BR.docx", supp = FALSE, dataset = FALSE) {
+export_package <- function(package, report_name, template_name = "template_PT-BR.docx", supp = FALSE, dataset = FALSE, add_toc = TRUE) {
 
  # Validation Step -------------------------------------------------------------
  stopifnot(
@@ -67,7 +68,13 @@ export_package <- function(package, report_name, template_name = "template_PT-BR
 
  stopifnot("Package must contain at least one content to be exported." = length(package@content_list) > 0)
 
+ stopifnot(
+   "`add_toc` must be provided." = !is.na(add_toc),
+   "`add_toc` must be a boolean." = is.logical(add_toc),
+   "`add_toc` cannot be an array." = length(add_toc) == 1
+ )
+
  # -----------------------------------------------------------------------------
 
- return(export_package_method(x = package, report_name = report_name, template_name = template_name, supp = supp, dataset = dataset))
+ return(export_package_method(x = package, report_name = report_name, template_name = template_name, supp = supp, dataset = dataset, add_toc = add_toc))
 }

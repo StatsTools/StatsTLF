@@ -9,7 +9,8 @@ export_package(
   report_name,
   template_name = "template_PT-BR.docx",
   supp = FALSE,
-  dataset = FALSE
+  dataset = FALSE,
+  add_toc = FALSE
 )
 }
 \arguments{
@@ -22,9 +23,11 @@ export_package(
 \item{supp}{A boolean to specify if 'S' should be added before content number in export.}
 
 \item{dataset}{A boolean to specify if export is a dataset type and not a report.}
+
+\item{add_toc}{A boolean to specify if table of contents should be added to the report.}
 }
 \value{
-A path to the report file.
+A path to the exported package.
 }
 \description{
 Export package

@@ -14,7 +14,8 @@ StatsTLF::export_package(
  report_name = 'SAR', # Please, do not change this if going to use `build_submission()`.
  template_name = "template_PT-BR.docx",
  supp = FALSE,
- dataset = FALSE
+ dataset = FALSE,
+ add_toc = FALSE
 )
 
 rm(list = ls())

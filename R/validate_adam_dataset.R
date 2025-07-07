@@ -3,7 +3,7 @@
 #' @param dataset A tibble with the dataset to be compared.
 #' @param path A character to specify the path of the metadata file in .xlsx format based on package template.
 #'
-#' @return A tibble with the dataset given but with attributes fixed.
+#' @return TRUE if dataset validated and FALSE if not.
 #' @export
 #'
 #' @examples
@@ -12,6 +12,7 @@ validate_adam_dataset <- function(dataset, path) {
   template <- create_adam_dataset(path)
 
   issues <- list()
+  issues_attr <- list()
 
   # 1. Check if columns order are as specified
   cols_dataset <- names(dataset)
@@ -34,7 +35,7 @@ validate_adam_dataset <- function(dataset, path) {
     col_dataset <- dataset[[col]]
     col_template <- template[[col]]
 
-    # Comparar classe
+    # Compare classes
     if (!identical(class(col_dataset), class(col_template))) {
       issues[[paste0("Class mismatch: ", col)]] <- list(
         expected = class(col_template),
@@ -42,7 +43,7 @@ validate_adam_dataset <- function(dataset, path) {
       )
     }
 
-    # If facotr, compare levels
+    # If factor, compare levels
     if ("factor" %in% class(col_template)) {
       levels_dataset <- levels(col_dataset)
       levels_template <- levels(col_template)
@@ -54,38 +55,25 @@ validate_adam_dataset <- function(dataset, path) {
       }
     }
 
-    attr(dataset[[col]], "group") <- attr(template[[col]], "group")
-    attr(dataset[[col]], "name") <- attr(template[[col]], "name")
-    attr(dataset[[col]], "label") <- attr(template[[col]], "label")
-    attr(dataset[[col]], "dtype") <- attr(template[[col]], "dtype")
-    attr(dataset[[col]], "type")  <- attr(template[[col]], "type")
-    attr(dataset[[col]], "source")  <- attr(template[[col]], "source")
-    attr(dataset[[col]], "related_vars")  <- attr(template[[col]], "related_vars")
-    attr(dataset[[col]], "closed") <- attr(template[[col]], "closed")
-    attr(dataset[[col]], "factor_levels") <- attr(template[[col]], "factor_levels")
-    attr(dataset[[col]], "factor_labels") <- attr(template[[col]], "factor_labels")
-    attr(dataset[[col]], "rule") <- attr(template[[col]], "rule")
-    attr(dataset[[col]], "use_levels") <- attr(template[[col]], "use_levels")
+    # # Check additional attributes
+    attrs_template <- attributes(col_template)
+    attrs_dataset <- attributes(col_dataset)
 
-    # # Check aditional attributes
-    # attrs_template <- attributes(col_template)
-    # attrs_dataset <- attributes(col_dataset)
-    #
-    # for (attr_name in names(attrs_template)) {
-    #   val_template <- attrs_template[[attr_name]]
-    #   val_dataset <- attrs_dataset[[attr_name]]
-    #   if (!identical(val_template, val_dataset)) {
-    #     issues[[paste0("Attribute mismatch: ", col, " [", attr_name, "]")]] <- list(
-    #       expected = val_template,
-    #       found = val_dataset
-    #     )
-    #   }
-    # }
+    for (attr_name in names(attrs_template)) {
+      if (attr_name %in% c("levels", "class")) next
+
+      val_template <- attrs_template[[attr_name]]
+      val_dataset <- attrs_dataset[[attr_name]]
+
+      if (!identical(val_template, val_dataset)) {
+        issues_attr[[col]] <- c(issues_attr[[col]], attr_name)
+      }
+    }
   }
 
-  if (length(issues) == 0) {
+  if (length(issues) == 0 & length(issues_attr) == 0) {
     message("✅ No structural mismatches found between dataset and metadata")
-    return(invisible(NULL))
+    error_trig <- TRUE
   } else {
     message("⚠️ Structural mismatches found:\n")
     for (issue in names(issues)) {
@@ -93,6 +81,12 @@ validate_adam_dataset <- function(dataset, path) {
       print(issues[[issue]])
       cat("\n")
     }
-    return(invisible(dataset))
+    for (issue_attr in names(issues_attr)) {
+      cat("• Attributes mismatch:", issue_attr, ":", paste(issues_attr[[issue_attr]], collapse = ", "), "\n")
+      cat("\n")
+    }
+    error_trig <- FALSE
   }
+
+  return(invisible(error_trig))
 }

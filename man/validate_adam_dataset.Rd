@@ -12,7 +12,7 @@ validate_adam_dataset(dataset, path)
 \item{path}{A character to specify the path of the metadata file in .xlsx format based on package template.}
 }
 \value{
-A tibble with the dataset given but with attributes fixed.
+TRUE if dataset validated and FALSE if not.
 }
 \description{
 Create a report with comparisons against given dataset and metadata file and fix attributes issues
