@@ -101,10 +101,16 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
     datasets_env <- from
     datasets_env[[main]] <- .data
 
-    condition_result <- rlang::eval_tidy(cond_expr, data = datasets_env)
+    caller_env <- rlang::caller_env()
+
+    condition_result <- rlang::eval_tidy(cond_expr, data = datasets_env, env = caller_env)
 
     if (!is.logical(condition_result)) {
       stop("`condition` must evaluate to a logical vector.")
+    }
+
+    if (length(condition_result) == 1 && isTRUE(condition_result)) {
+      condition_result <- rep(TRUE, nrow(.data))
     }
 
     matched_ids <- NULL
@@ -124,30 +130,34 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
     if (is.null(matched_ids)) matched_ids <- character(0)
 
     value_result <- if (rlang::is_call(val_expr) || rlang::is_symbol(val_expr)) {
-      rlang::eval_tidy(val_expr, data = datasets_env)
+      rlang::eval_tidy(val_expr, data = datasets_env, env = caller_env)
     } else {
       val_expr
     }
 
     is_compatible <- function(existing, incoming) {
-      if (is.factor(existing)) {
-        is.character(incoming) || is.factor(incoming)
-      } else if (is.numeric(existing)) {
-        is.numeric(incoming)
-      } else if (is.character(existing)) {
-        is.character(incoming) || is.factor(incoming)
+      if (existing == 'factor' & incoming == 'character') {
+        return(TRUE)
+      } else if (existing == 'character' & incoming == 'factor') {
+        return(TRUE)
+      } else if (existing == 'double' & incoming == 'integer') {
+        return(TRUE)
+      } else if (existing == 'integer' & incoming == 'double') {
+        return(TRUE)
+      } else if (existing == incoming) {
+        return(TRUE)
       } else {
-        identical(class(existing), class(incoming))
+        return(FALSE)
       }
     }
 
     if (!all(is.na(.data[[var_str]]))) {
-      existing_type <- stats::na.omit(.data[[var_str]])[1]
-      value_type <- stats::na.omit(value_result)[1]
+      existing_type <- typeof(stats::na.omit(.data[[var_str]])[1])
+      value_type <- typeof(stats::na.omit(value_result)[1])
       stopifnot("`value` type mismatch in case for variable `var`." = is_compatible(existing_type, value_type))
     }
 
-    if (is.factor(.data[[var_str]])) {
+    if (!is.null(levels)) {
       values_to_check <- unique(na.omit(value_result))
       invalid_values <- setdiff(values_to_check, levels)
       stopifnot("Validation error: Invalid value(s) assigned to factor `var` — not in defined levels: " = length(invalid_values) == 0)
@@ -167,7 +177,7 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
     datasets_env <- from
     datasets_env[[main]] <- .data
 
-    default_val <- rlang::eval_tidy(rlang::get_expr(default), data = datasets_env)
+    default_val <- rlang::eval_tidy(rlang::get_expr(default), data = datasets_env, env = caller_env)
 
     if (!all(is.na(.data[[var_str]]))) {
       existing_type <- typeof(stats::na.omit(.data[[var_str]])[1])
@@ -175,9 +185,9 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
       stopifnot("Validation error: Default value type mismatch for variable `var`." = is_compatible(existing_type, default_type))
     }
 
-    if (is.factor(.data[[var_str]])) {
+    if (!is.null(levels)) {
       default_values <- unique(na.omit(default_val))
-      invalid_defaults <- setdiff(default_values, var_levels)
+      invalid_defaults <- setdiff(default_values, levels)
       stopifnot("Validation error: Default value(s) assigned to factor `var` — not in defined levels: " = length(invalid_defaults) == 0)
     }
 

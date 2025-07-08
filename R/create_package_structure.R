@@ -38,7 +38,7 @@ create_package_structure <- function(pkg_name, dataset = FALSE) {
 
  if (dataset) {
    caller[14] <- paste0(" report_name = 'Datasets - ", pkg_name, "', # Please, do not change this if going to use `build_submission()`.")
-   caller[17] <- " dataset = TRUE"
+   caller[17] <- " dataset = TRUE,"
    caller <- caller[-c(15, 16)]
    caller <- caller[-c(4:8)]
    caller[3] <- "package_init <- StatsTLF::create_content_package()"
