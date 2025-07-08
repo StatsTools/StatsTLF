@@ -1,14 +1,21 @@
 #' Create a report with comparisons against given dataset and metadata file and fix attributes issues
 #'
 #' @param dataset A tibble with the dataset to be compared.
-#' @param path A character to specify the path of the metadata file in .xlsx format based on package template.
 #'
 #' @return TRUE if dataset validated and FALSE if not.
 #' @export
 #'
 #' @examples
 #' x <- validate_adam_dataset(dataset, 'ADSL.xlsx')
-validate_adam_dataset <- function(dataset, path) {
+validate_adam_dataset <- function(dataset) {
+
+  # 0. Check if path metadata is missing
+  if (is.null(attr(dataset, "path"))) {
+    stop('`Path` is missing. Please, use `set_adam_attr()` to fix this.')
+  }
+
+  path <- attr(dataset, 'path')
+
   template <- create_adam_dataset(path)
 
   issues <- list()

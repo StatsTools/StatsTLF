@@ -146,5 +146,7 @@ create_adam_dataset <- function(path, use_labels = FALSE) {
 
  adam_dataset <- tibble::tibble(!!!purrr::list_flatten(adam_map))
 
+ attr(adam_dataset, "path") <- path
+
  return(adam_dataset)
 }

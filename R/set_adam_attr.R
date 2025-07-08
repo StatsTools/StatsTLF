@@ -31,5 +31,7 @@ set_adam_attr <- function(dataset, path) {
     attr(dataset[[col]], "use_levels") <- attr(template[[col]], "use_levels")
   }
 
+  attr(dataset, "path") <- attr(template, "path")
+
   return(dataset)
 }

@@ -18,6 +18,10 @@ simulate_adam_dataset <- function(dataset, n = 10) {
   )
  # -----------------------------------------------------------------------------
 
+  stopifnot("Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(dataset))
+
+  path <- attr(dataset, "path")
+
   cols <- lapply(names(dataset), function(colname) {
     col <- dataset[[colname]]
 
@@ -80,6 +84,8 @@ simulate_adam_dataset <- function(dataset, n = 10) {
   })
 
   simulated_dataset <- tibble::tibble(!!!rlang::set_names(cols, names(dataset)))
+
+  attr(simulated_dataset, "path") <- path
 
   return(simulated_dataset)
 }

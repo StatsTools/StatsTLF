@@ -4,12 +4,10 @@
 \alias{validate_adam_dataset}
 \title{Create a report with comparisons against given dataset and metadata file and fix attributes issues}
 \usage{
-validate_adam_dataset(dataset, path)
+validate_adam_dataset(dataset)
 }
 \arguments{
 \item{dataset}{A tibble with the dataset to be compared.}
-
-\item{path}{A character to specify the path of the metadata file in .xlsx format based on package template.}
 }
 \value{
 TRUE if dataset validated and FALSE if not.

@@ -10,7 +10,7 @@ export_package(
   template_name = "template_PT-BR.docx",
   supp = FALSE,
   dataset = FALSE,
-  add_toc = FALSE
+  add_toc = TRUE
 )
 }
 \arguments{

@@ -46,7 +46,7 @@ backbone <- StatsTLF::create_content_backbone(title = '', type = '', fun = funct
  # -                   Step 03: Input validation (bullet proof).               -
  # -----------------------------------------------------------------------------
 
- stopifnot("Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(dataset, './00_Template/adam_template.xlsx'))
+ stopifnot("Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(dataset))
 
  # -----------------------------------------------------------------------------
  # -                   Step 04: Extract relevant variables.                    -
