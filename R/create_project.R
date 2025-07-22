@@ -33,14 +33,17 @@ create_project <- function(proj_name, path = NA_character_, open = TRUE, rstudio
  template_dir <- system.file("", package = "StatsTLF")
  template_name <- '\\template_PT-BR.docx'
  template_name2 <- '\\template_EN-US.docx'
- template_name3 <- '\\adam_template.xlsx'
+ template_name3 <- '\\template_spec.xlsx'
+ template_name4 <- '\\snippets.R'
  template_path <- paste0(template_dir, template_name)
  template_path2 <- paste0(template_dir, template_name2)
  template_path3 <- paste0(template_dir, template_name3)
+ template_path4 <- paste0(template_dir, template_name4)
 
  file.copy(template_path, paste0(path, '\\00_Template', template_name))
  file.copy(template_path2, paste0(path, '\\00_Template', template_name2))
- file.copy(template_path3, paste0(path, '\\00_Template', template_name3))
+ file.copy(template_path3, paste0(path, '\\01_Documents', template_name3))
+ file.copy(template_path4, paste0(path, '\\01_Documents', template_name4))
 
  rprofile_path <- paste0(template_dir, '\\Rprofile.R')
 

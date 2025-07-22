@@ -4,12 +4,14 @@
 \alias{set_adam_attr}
 \title{Set ADaM attributes for a given dataset and metadata file}
 \usage{
-set_adam_attr(dataset, path)
+set_adam_attr(dataset, path, name)
 }
 \arguments{
 \item{dataset}{A tibble with the dataset to be compared.}
 
 \item{path}{A character to specify the path of the metadata file in .xlsx format based on package template.}
+
+\item{name}{A character to specify the name of dataset in the metadata file.}
 }
 \value{
 A tibble.

@@ -1,30 +1,29 @@
-#' Derive or Update Variables in an ADaM Dataset with Complex Conditions
+#' Derive variable in an ADaM Dataset with Complex Conditions
 #'
-#' This function derives or updates a variable in a primary dataset (e.g., ADSL) based on
+#' This function derives a variable in a primary dataset (e.g., ADSL) based on
 #' complex conditions involving multiple auxiliary datasets. It supports multiple conditional
 #' assignments and a default value.
 #'
-#' @param .data A data frame (primary dataset) where the variable will be derived or updated.
-#' @param var Symbol or string. Name of the variable to be derived or updated in `.data`.
-#' @param main String. Name of the primary dataset within the `from` list (usually `.data` name).
+#' @param .data A data frame (primary dataset) where the variable will be derived
+#' @param var Symbol. Name of the variable to be derived in `.data`.
 #' @param from Named list of data frames. Auxiliary datasets used in conditional expressions.
 #' Each dataset must be named, e.g., `list(ADPD = adpd_df, ADIS = adis_df)`.
 #' @param cases List of lists. Each inner list must have two elements: `condition` and `value`.
 #' - `condition`: an expression evaluated within the environment containing `.data` and `from` datasets. Use `derive_expr()` to encapsulate the condition.
 #' - `value`: expression or constant to assign to `var` when `condition` is TRUE.  Use `derive_expr()` to encapsulate the condition.
 #' The conditions are evaluated in order; the first matching case has precedence.
-#' @param by String. The subject identifier variable name common to `.data` and all datasets in `from`.
+#' @param by Symbol. The subject identifier variable name common to `.data` and all datasets in `from`.
 #' Used to match rows across datasets (default is `"USUBJID"`).
 #' @param default Value or expression assigned to `var` for rows where no `cases` condition matches. Use `derive_expr()` to encapsulate the condition.
 #' Defaults to `NA`.
 #'
 #' @return
-#' The original dataset `.data` with the variable `var` derived or updated accordingly.
+#' The original dataset `.data` with the variable `var` derived accordingly.
 #'
 #' @examples
 #' \dontrun{
-#' adsl <- derive(adsl, var = FASFL, main = "ADSL",
-#'   from = list(ADPD = adpd),
+#' adsl <- derive(adsl, var = FASFL,
+#'   from = list(adpd),
 #'   cases = list(
 #'     list(
 #'       condition = ADSL$RANDFL == "Y" & ADPD$PARAMCD == "HI - A H5N8" & ADPD$AVAL != "Vazio",
@@ -36,12 +35,11 @@
 #' }
 #'
 #' @export
-derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJID", default = NA) {
+derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, default = NA) {
   stopifnot("Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(.data))
 
   var <- rlang::ensym(var)
-  by_sym <- rlang::ensym(by)
-  by_str <- rlang::as_string(by_sym)
+  by_str <- purrr::map_chr(by, rlang::as_string)
   var_str <- rlang::as_string(var)
 
   stopifnot(
@@ -50,22 +48,18 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
   )
 
   stopifnot(
-    "`main` must be provided." = !is.na(main),
-    "`main` must be a character." = is.character(main),
-    "`main` cannot be an array." = length(main) == 1
-  )
-
-  stopifnot(
     "`from` must be a list." = is.list(from),
     "Each element of `from` must be named." = length(from) == 0 || all(nzchar(names(from)))
   )
 
-  if (length(from) > 0) {
-    for (ds_name in names(from)) {
-      ds <- from[[ds_name]]
-      stopifnot("Validation error: Datasets in `from` does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(ds))
-    }
-  }
+  # if (length(from) > 0) {
+  #   for (ds_name in names(from)) {
+  #     ds <- from[[ds_name]]
+  #     stopifnot("Validation error: Datasets in `from` does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(ds))
+  #   }
+  # }
+
+  names(from) <- vapply(from, function(ds) attr(ds, "name"), character(1))
 
   stopifnot(
     "`cases` must be a list." = is.list(cases),
@@ -77,14 +71,14 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
       )
   )
 
-  stopifnot(
-    "`by` must be provided." = !is.na(by),
-    "`by` must be a character." = is.character(by),
-    "`by` cannot be an array." = length(by) == 1,
-    "`by` must exist in .data and all `from` datasets." = by_str %in% colnames(.data) && all(vapply(from, function(x) by_str %in% colnames(x), logical(1)))
-  )
+  # stopifnot(
+  #   "`by` must exist in .data and all `from` datasets." = by_str %in% colnames(.data) && all(vapply(from, function(x) by_str %in% colnames(x), logical(1)))
+  # )
 
   path <- attr(.data, 'path')
+  name <- attr(.data, 'name')
+
+  main <- name
 
   levels <- if (is.factor(.data[[var_str]])) {
     levels(.data[[var_str]])
@@ -117,13 +111,21 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
     for (nm in names(datasets_env)) {
       dataset <- datasets_env[[nm]]
       if (length(condition_result) == nrow(dataset)) {
-        ids <- dataset[[by_str]][condition_result]
+        if (length(by_str) == 1) {
+          ids <- dataset[[by_str]][condition_result]
+        } else {
+          ids <- dataset[condition_result, by_str, drop = FALSE]
+        }
         matched_ids <- union(matched_ids, ids)
       }
     }
 
     if (length(condition_result) == nrow(.data)) {
-      ids <- .data[[by_str]][condition_result]
+      if (length(by_str) == 1) {
+        ids <- .data[[by_str]][condition_result]
+      } else {
+        ids <- .data[condition_result, by_str, drop = FALSE]
+      }
       matched_ids <- union(matched_ids, ids)
     }
 
@@ -163,14 +165,27 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
       stopifnot("Validation error: Invalid value(s) assigned to factor `var` — not in defined levels: " = length(invalid_values) == 0)
     }
 
-    .data <- .data |>
-      dplyr::mutate(
-        !!var := dplyr::if_else(
-          is.na(.data[[rlang::as_string(var)]]) & .data[[by_str]] %in% matched_ids,
-          value_result,
-          !!var
+    if (length(by_str) == 1) {
+      .data <- .data |>
+        dplyr::mutate(
+          !!var := dplyr::if_else(
+            is.na(.data[[rlang::as_string(var)]]) & .data[[by_str]] %in% matched_ids,
+            value_result,
+            !!var
+          )
         )
-      )
+    } else {
+      matched_ids <- do.call(paste0, matched_ids)
+      data_ids <- do.call(paste0, .data[, by_str, drop = FALSE])
+      .data <- .data |>
+        dplyr::mutate(
+          !!var := dplyr::if_else(
+            is.na(.data[[rlang::as_string(var)]]) & data_ids %in% matched_ids,
+            value_result,
+            !!var
+          )
+        )
+    }
   }
 
   if (!identical(default, NA)) {
@@ -208,7 +223,7 @@ derive <- function(.data, var, main, from = list(), cases = list(), by = "USUBJI
       )
   }
 
-  .data <- set_adam_attr(.data, path)
+  .data <- set_adam_attr(.data, path, name)
 
   stopifnot("Validation error: The final dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(.data))
 

@@ -1,0 +1,13 @@
+snippet derive
+  StatsTLF::derive(var = ${1:VAR}, from = list(${2:FROM}), by = rlang::exprs(${3:BY}),
+    cases = list(
+      list(
+        condition = StatsTLF::derive_expr(${4:CONDITION}),
+        value = StatsTLF::derive_expr(${5:VALUE})
+      )
+    ),
+    default = ${6:DEFAULT}
+  )
+
+snippet derive2
+  StatsTLF::derive2(${1:VAR_TARGET}, ${2:VAR_SOURCE}, by = rlang::exprs(${3:BY}))

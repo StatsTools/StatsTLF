@@ -18,6 +18,11 @@ validate_adam_dataset <- function(dataset) {
 
   template <- create_adam_dataset(path)
 
+  target_name <- attr(dataset, "name")
+  match_idx <- which(purrr::map_chr(template, ~ attr(.x, "name")) == target_name)
+  stopifnot('Dataset name not found in metadata.' = length(match_idx) == 1)
+  template <- template[[match_idx]]
+
   issues <- list()
   issues_attr <- list()
 

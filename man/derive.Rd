@@ -2,24 +2,14 @@
 % Please edit documentation in R/derive.R
 \name{derive}
 \alias{derive}
-\title{Derive or Update Variables in an ADaM Dataset with Complex Conditions}
+\title{Derive variable in an ADaM Dataset with Complex Conditions}
 \usage{
-derive(
-  .data,
-  var,
-  main,
-  from = list(),
-  cases = list(),
-  by = "USUBJID",
-  default = NA
-)
+derive(.data, var, from = list(), cases = list(), by = USUBJID, default = NA)
 }
 \arguments{
-\item{.data}{A data frame (primary dataset) where the variable will be derived or updated.}
+\item{.data}{A data frame (primary dataset) where the variable will be derived}
 
-\item{var}{Symbol or string. Name of the variable to be derived or updated in `.data`.}
-
-\item{main}{String. Name of the primary dataset within the `from` list (usually `.data` name).}
+\item{var}{Symbol. Name of the variable to be derived in `.data`.}
 
 \item{from}{Named list of data frames. Auxiliary datasets used in conditional expressions.
 Each dataset must be named, e.g., `list(ADPD = adpd_df, ADIS = adis_df)`.}
@@ -29,24 +19,24 @@ Each dataset must be named, e.g., `list(ADPD = adpd_df, ADIS = adis_df)`.}
 - `value`: expression or constant to assign to `var` when `condition` is TRUE.  Use `derive_expr()` to encapsulate the condition.
 The conditions are evaluated in order; the first matching case has precedence.}
 
-\item{by}{String. The subject identifier variable name common to `.data` and all datasets in `from`.
+\item{by}{Symbol. The subject identifier variable name common to `.data` and all datasets in `from`.
 Used to match rows across datasets (default is `"USUBJID"`).}
 
 \item{default}{Value or expression assigned to `var` for rows where no `cases` condition matches. Use `derive_expr()` to encapsulate the condition.
 Defaults to `NA`.}
 }
 \value{
-The original dataset `.data` with the variable `var` derived or updated accordingly.
+The original dataset `.data` with the variable `var` derived accordingly.
 }
 \description{
-This function derives or updates a variable in a primary dataset (e.g., ADSL) based on
+This function derives a variable in a primary dataset (e.g., ADSL) based on
 complex conditions involving multiple auxiliary datasets. It supports multiple conditional
 assignments and a default value.
 }
 \examples{
 \dontrun{
-adsl <- derive(adsl, var = FASFL, main = "ADSL",
-  from = list(ADPD = adpd),
+adsl <- derive(adsl, var = FASFL,
+  from = list(adpd),
   cases = list(
     list(
       condition = ADSL$RANDFL == "Y" & ADPD$PARAMCD == "HI - A H5N8" & ADPD$AVAL != "Vazio",

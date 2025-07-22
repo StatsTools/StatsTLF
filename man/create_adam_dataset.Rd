@@ -4,12 +4,10 @@
 \alias{create_adam_dataset}
 \title{Create an analysis dataset based on metadata file}
 \usage{
-create_adam_dataset(path, use_labels = FALSE)
+create_adam_dataset(path)
 }
 \arguments{
 \item{path}{A character to specify the path of the metadata file in .xlsx format based on package template.}
-
-\item{use_labels}{A boolean to specify if factor labels should be used instead of factor levels.}
 }
 \value{
 A tibble based on metadata file with zero rows

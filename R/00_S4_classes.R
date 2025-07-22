@@ -110,20 +110,84 @@ setMethod('prepare_to_export_method', 'Content', function(x, number, doc, sep_su
 
  if (!is.na(x@subtitle)) {
   if (!is.na(x@population)) {
-   if (sep_subtitle == 'newline' & sep_population == 'newline') fpar_text <- officer::fpar(title_text, officer::run_linebreak(), x@subtitle, officer::run_linebreak(), x@population)
-   if (sep_subtitle == 'newline' & sep_population != 'newline') fpar_text <- officer::fpar(title_text, officer::run_linebreak(), x@subtitle, sep_population, x@population)
-   if (sep_subtitle != 'newline' & sep_population == 'newline') fpar_text <- officer::fpar(title_text, sep_subtitle, x@subtitle, officer::run_linebreak(), x@population)
-   if (sep_subtitle != 'newline' & sep_population != 'newline') fpar_text <- officer::fpar(title_text, sep_subtitle, x@subtitle, sep_population, x@population)
+   if (sep_subtitle == 'newline' & sep_population == 'newline') {
+     fpar_text <- officer::fpar(title_text, officer::run_linebreak(), x@subtitle, officer::run_linebreak(), x@population)
+     fpar_text2 <- officer::block_list(
+       officer::fpar(title_text, fp_p = officer::fp_par(text.align = "center")),
+       officer::run_linebreak(),
+       officer::fpar(x@subtitle, fp_p = officer::fp_par(text.align = "center")),
+       officer::run_linebreak(),
+       officer::fpar(x@population, fp_p = officer::fp_par(text.align = "center")),
+       officer::fpar()
+     )
+   }
+   if (sep_subtitle == 'newline' & sep_population != 'newline') {
+     fpar_text <- officer::fpar(title_text, officer::run_linebreak(), x@subtitle, sep_population, x@population)
+     fpar_text2 <- officer::block_list(
+       officer::fpar(title_text, fp_p = officer::fp_par(text.align = "center")),
+       officer::run_linebreak(),
+       officer::fpar(paste0(x@subtitle, sep_population, x@population), fp_p = officer::fp_par(text.align = "center")),
+       officer::fpar()
+     )
+   }
+   if (sep_subtitle != 'newline' & sep_population == 'newline') {
+     fpar_text <- officer::fpar(title_text, sep_subtitle, x@subtitle, officer::run_linebreak(), x@population)
+     fpar_text2 <- officer::block_list(
+       officer::fpar(paste0(title_text, sep_subtitle, x@subtitle), fp_p = officer::fp_par(text.align = "center")),
+       officer::run_linebreak(),
+       officer::fpar(x@population, fp_p = officer::fp_par(text.align = "center")),
+       officer::fpar()
+     )
+   }
+   if (sep_subtitle != 'newline' & sep_population != 'newline') {
+     fpar_text <- officer::fpar(title_text, sep_subtitle, x@subtitle, sep_population, x@population)
+     fpar_text2 <- officer::block_list(
+       officer::fpar(paste0(title_text, sep_subtitle, x@subtitle, sep_population, x@population), fp_p = officer::fp_par(text.align = "center")),
+       officer::fpar()
+     )
+   }
   } else {
-   if (sep_subtitle == 'newline') fpar_text <- officer::fpar(title_text, officer::run_linebreak(), x@subtitle)
-   if (sep_subtitle != 'newline') fpar_text <- officer::fpar(title_text, sep_subtitle, x@subtitle)
+   if (sep_subtitle == 'newline') {
+     fpar_text <- officer::fpar(title_text, officer::run_linebreak(), x@subtitle)
+     fpar_text2 <- officer::block_list(
+       officer::fpar(title_text, fp_p = officer::fp_par(text.align = "center")),
+       officer::run_linebreak(),
+       officer::fpar(x@subtitle, fp_p = officer::fp_par(text.align = "center")),
+       officer::fpar()
+     )
+   }
+   if (sep_subtitle != 'newline') {
+     fpar_text <- officer::fpar(title_text, sep_subtitle, x@subtitle)
+     fpar_text2 <- officer::block_list(
+       officer::fpar(paste0(title_text, sep_subtitle, x@subtitle), fp_p = officer::fp_par(text.align = "center")),
+       officer::fpar()
+     )
+   }
   }
  } else {
   if (!is.na(x@population)) {
-   if (sep_population == 'newline') fpar_text <- officer::fpar(title_text, officer::run_linebreak(), x@population)
-   if (sep_population != 'newline') fpar_text <- officer::fpar(title_text, sep_population, x@population)
+   if (sep_population == 'newline') {
+     fpar_text <- officer::fpar(title_text, officer::run_linebreak(), x@population)
+     fpar_text2 <- officer::block_list(
+       officer::fpar(title_text, fp_p = officer::fp_par(text.align = "center")),
+       officer::run_linebreak(),
+       officer::fpar(x@population, fp_p = officer::fp_par(text.align = "center")),
+       officer::fpar()
+     )
+   }
+   if (sep_population != 'newline') {
+     fpar_text <- officer::fpar(title_text, sep_population, x@population)
+     fpar_text2 <- officer::block_list(
+       officer::fpar(paste0(title_text, sep_subtitle, x@population), fp_p = officer::fp_par(text.align = "center")),
+       officer::fpar()
+     )
+   }
   } else {
    fpar_text <- officer::fpar(title_text)
+   fpar_text2 <- officer::block_list(
+     officer::fpar(title_text, fp_p = officer::fp_par(text.align = "center")),
+     officer::fpar()
+   )
   }
  }
 
@@ -138,9 +202,19 @@ setMethod('prepare_to_export_method', 'Content', function(x, number, doc, sep_su
  if (!is.na(x@subtitle)) cat('    \u251C\u2500\u2500 Subtitle:', x@subtitle, '\n')
  if (!is.na(x@population)) cat('    \u251C\u2500\u2500 Population:', x@population, '\n')
 
+ sect_properties <- officer::prop_section(
+   page_size = officer::page_size(
+     orient = "landscape",
+     width = 8.3, height = 11.7
+   ),
+   type = "continuous",
+   page_margins = officer::page_mar(),
+   header_default = fpar_text2
+ )
+
  if (x@type == 'F') {
   ggplot2::ggsave(paste0(img_path, '.jpeg'), x@content, width = x@fdim$width, height = x@fdim$height, dpi = x@fdim$dpi, units = "in", device = 'jpeg', quality = 100)
-  ggplot2::ggsave(paste0(img_path, '.pdf'), x@content, width = x@fdim$width, height = x@fdim$height, dpi = x@fdim$dpi, units = "in", device = cairo_pdf)
+  # ggplot2::ggsave(paste0(img_path, '.pdf'), x@content, width = x@fdim$width, height = x@fdim$height, dpi = x@fdim$dpi, units = "in", device = cairo_pdf)
 
   if (x@fdim$width != 9 | x@fdim$height != 5) {
     customfdim_dir <- system.file("", package = "StatsTLF")
@@ -150,19 +224,43 @@ setMethod('prepare_to_export_method', 'Content', function(x, number, doc, sep_su
    doc <- doc |>
     officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
     officer::body_add_img(src = customfdim_path, width = 9, height = 5, style = content_prepared$else_style)
+
+   rtf_doc <- officer::rtf_doc(def_sec = sect_properties)
+   rtf_doc <- officer::rtf_add(rtf_doc, content_prepared$content, width = 9, height = 5)
+   print(rtf_doc, target = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("figure_", number, ".rtf")))
+
+   unlink(paste0(img_path, '.jpeg'))
+   # unlink(paste0(img_path, '.pdf'))
   } else {
    doc <- doc |>
     officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
     officer::body_add_img(src = paste0(img_path, '.jpeg'), width = 9, height = 5, style = content_prepared$else_style)
+
+   rtf_doc <- officer::rtf_doc(def_sec = sect_properties)
+   rtf_doc <- officer::rtf_add(rtf_doc, content_prepared$content, width = 9, height = 5)
+   print(rtf_doc, target = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("figure_", number, ".rtf")))
+
+   unlink(paste0(img_path, '.jpeg'))
+   # unlink(paste0(img_path, '.pdf'))
   }
  } else if (x@type == 'T') {
   doc <- doc |>
    officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
    flextable::body_add_flextable(value = content_prepared$content)
+
+  flextable::save_as_rtf(
+    content_prepared$content,
+    path = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("table_", number, ".rtf")), pr_section = sect_properties
+  )
  } else if (x@type == 'L') {
   doc <- doc |>
    officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
    officer::body_add_table(value = content_prepared$content, style = content_prepared$else_style)
+
+  flextable::save_as_rtf(
+    flextable::flextable(content_prepared$content),
+    path = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("listing_", number, ".rtf")), pr_section = sect_properties
+  )
  }
 
  if (last == FALSE) doc <- doc |> officer::body_add_break()
@@ -201,6 +299,17 @@ setMethod('add_to_package_method', 'ContentPackage', function(x, content) {
 
 setGeneric('export_package_method', function(x, report_name, template_name, supp = FALSE, dataset = FALSE, add_toc = TRUE) standardGeneric('export_package_method'))
 setMethod('export_package_method', 'ContentPackage', function(x, report_name, template_name, supp = FALSE, dataset = FALSE, add_toc = TRUE) {
+  convert_r_to_txt <- function(input_folder, output_folder) {
+    r_files <- list.files(path = input_folder, pattern = "\\.R$", full.names = TRUE)
+    for (r_file in r_files) {
+      content <- readLines(r_file, warn = FALSE)
+
+      file_base <- tools::file_path_sans_ext(basename(r_file))
+      txt_file <- file.path(output_folder, paste0(file_base, ".txt"))
+
+      writeLines(content, txt_file)
+    }
+  }
 
  cat('  Exporting content package:\n')
 
@@ -210,8 +319,14 @@ setMethod('export_package_method', 'ContentPackage', function(x, report_name, te
    unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
    dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
 
-   saveRDS(x@content_list, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), ".RDS"))
-   Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), ".RDS"), mode = "0444")
+   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets'))
+   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets', '/', 'programs'))
+
+   saveRDS(x@content_list, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), ".RDS"))
+   Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), ".RDS"), mode = "0444")
+
+   convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', sub("^Datasets - ", "", report_name)), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/programs'))
+   convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', sub("^Datasets - ", "", report_name), '/backbones'), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/programs'))
 
    cat('  Done!\n')
 
@@ -224,6 +339,12 @@ setMethod('export_package_method', 'ContentPackage', function(x, report_name, te
      dir = tempfile(pattern = format(Sys.time(), "%Y_%m_%d_%H_%M_%S_"))
    )
    dir.create(output$dir)
+   dir.create(paste0(output$dir, '/', 'adam'))
+   dir.create(paste0(output$dir, '/', 'adam', '/', 'programs'))
+   dir.create(paste0(output$dir, '/', 'documents'))
+   dir.create(paste0(output$dir, '/', 'documents', '/', 'define'))
+   dir.create(paste0(output$dir, '/', 'tlf'))
+   dir.create(paste0(output$dir, '/', 'tlf', '/', 'rtf'))
 
    types <- sapply(x@content_list, function(x) return(x@type))
    sections <- sapply(x@content_list, function(x) return(x@section))
@@ -266,19 +387,21 @@ setMethod('export_package_method', 'ContentPackage', function(x, report_name, te
        doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
      }
    }
-   print(doc, target = paste0(output$dir, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'))
+   print(doc, target = paste0(output$dir, '/tlf/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'))
 
    unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
    dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
 
    files_to_copy <- list.files(output$dir, full.names = TRUE)
-   file.copy(from = files_to_copy, to = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), overwrite = TRUE, recursive = FALSE, copy.mode = TRUE)
-   Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), mode = "0444", use_umask = FALSE)
+   file.copy(from = files_to_copy, to = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), overwrite = TRUE, recursive = TRUE, copy.mode = TRUE)
+   Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), mode = "0444", use_umask = FALSE)
 
    cat('  Done!\n')
 
    cat(paste0('\n\n Report avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
 
+   convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', sub("^SAR - ", "", report_name)), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/adam/programs'))
+   convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', sub("^SAR - ", "", report_name), '/backbones'), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/adam/programs'))
  }
 
  return(invisible(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"))))
