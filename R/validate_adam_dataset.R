@@ -1,12 +1,18 @@
-#' Create a report with comparisons against given dataset and metadata file and fix attributes issues
+#' Validate ADaM Dataset Against Metadata File
 #'
-#' @param dataset A tibble with the dataset to be compared.
+#' This function validates a dataset by comparing it against a metadata file, checking for structural mismatches and attribute inconsistencies. It reports any issues found and suggests using `set_adam_attr()` to fix missing metadata paths.
 #'
-#' @return TRUE if dataset validated and FALSE if not.
+#' @param dataset A tibble containing the dataset to be validated.
+#'
+#' @return TRUE if the dataset is validated successfully; FALSE if there are mismatches.
 #' @export
 #'
 #' @examples
-#' x <- validate_adam_dataset(dataset, 'ADSL.xlsx')
+#' \dontrun{
+#' # Example usage:
+#' # Validate a dataset against the 'ADSL.xlsx' metadata file
+#' x <- validate_adam_dataset(dataset)
+#' }
 validate_adam_dataset <- function(dataset) {
 
   # 0. Check if path metadata is missing

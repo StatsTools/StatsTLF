@@ -1,12 +1,18 @@
-#' Create an analysis dataset based on metadata file
+#' Create Analysis Dataset
 #'
-#' @param path A character to specify the path of the metadata file in .xlsx format based on package template.
+#' This function generates an analysis dataset structure with zero rows based on the provided metadata file in .xlsx format. The metadata should follow the package template, including sheets for datasets, variables, and codelists.
 #'
-#' @return A tibble based on metadata file with zero rows
+#' @param path A character string specifying the path to the metadata file in .xlsx format.
+#'
+#' @return A list of tibbles, each representing a dataset defined in the metadata file, with zero rows.
 #' @export
 #'
 #' @examples
-#' x <- create_adam_dataset('ADSL.xlsx')
+#' \dontrun{
+#' # Example usage:
+#' # Create an analysis dataset structure from 'Spec.xlsx'
+#' x <- create_adam_dataset('Spec.xlsx')
+#' }
 create_adam_dataset <- function(path) {
 
   # Validation Step -------------------------------------------------------------

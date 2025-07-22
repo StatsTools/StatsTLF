@@ -9,13 +9,20 @@ setClass(
 )
 
 # 'ContentBackbone' methods -----------------------------------------------------
-setGeneric('create_content_method', function(x, value, subtitle, population, section, fdim, ...) standardGeneric('create_content_method'))
-setMethod('create_content_method', 'ContentBackbone', function(x, value, subtitle, population, section, fdim, ...) {
+setGeneric('create_content_method', function(x, id, value, subtitle, population, section, fdim, ...) standardGeneric('create_content_method'))
+setMethod('create_content_method', 'ContentBackbone', function(x, id, value, subtitle, population, section, fdim, ...) {
 
- cat('  \u2500 Creating content:', x@type, '->', x@title, '...')
+ cat('  \u2500 Creating content:\n')
+ cat('    \u2500 ID:', ifelse(is.na(id), "", id), '\n')
+ cat('    \u2500 Type:', ifelse(is.na(x@type), "", x@type), '\n')
+ cat('    \u2500 Title:', ifelse(is.na(x@title), "", x@title), '\n')
+ cat('    \u2500 Subtitle:', ifelse(is.na(subtitle), "", subtitle), '\n')
+ cat('    \u2500 Population:', ifelse(is.na(population), "", population), '\n')
+ cat('    \u2500 Section:', ifelse(is.na(section), "", section), '\n')
 
  content <- new(
   'Content',
+  id = id,
   section = section,
   title = x@title,
   subtitle = subtitle,
@@ -25,7 +32,7 @@ setMethod('create_content_method', 'ContentBackbone', function(x, value, subtitl
   fdim = fdim
  )
 
- cat(' Done!\n')
+ cat('  Done!\n')
 
  return(content)
 })
@@ -52,10 +59,10 @@ if (is.null(getClassDef("flextableORggORtbl_dfORgtable"))) {
   setClassUnion('flextableORggORtbl_dfORgtable', c('flextable', 'gg', 'tbl_df', 'gtable'))
 }
 
-
 setClass(
  'Content',
  slots = c(
+  id = 'character',
   section = 'character',
   title = 'character',
   subtitle = 'character',
@@ -198,10 +205,6 @@ setMethod('prepare_to_export_method', 'Content', function(x, number, doc, sep_su
   content = x@content
  )
 
- cat('    \u250C\u2500', title_text, '\n')
- if (!is.na(x@subtitle)) cat('    \u251C\u2500\u2500 Subtitle:', x@subtitle, '\n')
- if (!is.na(x@population)) cat('    \u251C\u2500\u2500 Population:', x@population, '\n')
-
  sect_properties <- officer::prop_section(
    page_size = officer::page_size(
      orient = "landscape",
@@ -214,35 +217,16 @@ setMethod('prepare_to_export_method', 'Content', function(x, number, doc, sep_su
 
  if (x@type == 'F') {
   ggplot2::ggsave(paste0(img_path, '.jpeg'), x@content, width = x@fdim$width, height = x@fdim$height, dpi = x@fdim$dpi, units = "in", device = 'jpeg', quality = 100)
-  # ggplot2::ggsave(paste0(img_path, '.pdf'), x@content, width = x@fdim$width, height = x@fdim$height, dpi = x@fdim$dpi, units = "in", device = cairo_pdf)
 
-  if (x@fdim$width != 9 | x@fdim$height != 5) {
-    customfdim_dir <- system.file("", package = "StatsTLF")
-    customfdim_name <- paste0('/custom_fdim_figure_', language, '.jpeg')
-    customfdim_path <- paste0(customfdim_dir, customfdim_name)
+  doc <- doc |>
+   officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
+   officer::body_add_img(src = paste0(img_path, '.jpeg'), width = 9, height = 5, style = content_prepared$else_style)
 
-   doc <- doc |>
-    officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
-    officer::body_add_img(src = customfdim_path, width = 9, height = 5, style = content_prepared$else_style)
+  rtf_doc <- officer::rtf_doc(def_sec = sect_properties)
+  rtf_doc <- officer::rtf_add(rtf_doc, content_prepared$content, width = 9, height = 5)
+  print(rtf_doc, target = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("figure_", number, ".rtf")))
 
-   rtf_doc <- officer::rtf_doc(def_sec = sect_properties)
-   rtf_doc <- officer::rtf_add(rtf_doc, content_prepared$content, width = 9, height = 5)
-   print(rtf_doc, target = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("figure_", number, ".rtf")))
-
-   unlink(paste0(img_path, '.jpeg'))
-   # unlink(paste0(img_path, '.pdf'))
-  } else {
-   doc <- doc |>
-    officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
-    officer::body_add_img(src = paste0(img_path, '.jpeg'), width = 9, height = 5, style = content_prepared$else_style)
-
-   rtf_doc <- officer::rtf_doc(def_sec = sect_properties)
-   rtf_doc <- officer::rtf_add(rtf_doc, content_prepared$content, width = 9, height = 5)
-   print(rtf_doc, target = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("figure_", number, ".rtf")))
-
-   unlink(paste0(img_path, '.jpeg'))
-   # unlink(paste0(img_path, '.pdf'))
-  }
+  unlink(paste0(img_path, '.jpeg'))
  } else if (x@type == 'T') {
   doc <- doc |>
    officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
@@ -253,19 +237,23 @@ setMethod('prepare_to_export_method', 'Content', function(x, number, doc, sep_su
     path = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("table_", number, ".rtf")), pr_section = sect_properties
   )
  } else if (x@type == 'L') {
+  flex_cont <- flextable::flextable(content_prepared$content) |>
+    flextable::align(align = "center", part = "all") |>
+    flextable::bold(part = "header") |>
+    flextable::theme_vanilla() |>
+    flextable::bg(i = seq(1, nrow(content_prepared$content), 2), bg = "#F2F2F2", part = "body")
+
   doc <- doc |>
    officer::body_add_fpar(content_prepared$fpar_text, style = content_prepared$text_style) |>
-   officer::body_add_table(value = content_prepared$content, style = content_prepared$else_style)
+   flextable::body_add_flextable(value = flex_cont)
 
   flextable::save_as_rtf(
-    flextable::flextable(content_prepared$content),
+    flex_cont,
     path = file.path(paste0(fig_path, '/', 'tlf', '/', 'rtf'), paste0("listing_", number, ".rtf")), pr_section = sect_properties
   )
  }
 
  if (last == FALSE) doc <- doc |> officer::body_add_break()
-
- cat('    \u2514\u2500 Done!\n')
 
  return(doc)
 })
@@ -275,6 +263,7 @@ setMethod('prepare_to_export_method', 'Content', function(x, number, doc, sep_su
 setClass(
  'ContentPackage',
  slots = c(
+  name = 'character',
   content_list = 'list',
   start_number = 'list',
   sep_subtitle = 'character',
@@ -288,121 +277,144 @@ setClass(
 setGeneric('add_to_package_method', function(x, content) standardGeneric('add_to_package_method'))
 setMethod('add_to_package_method', 'ContentPackage', function(x, content) {
 
- cat('      Adding content to package ...')
-
  x@content_list <- append(x@content_list, list(content))
-
- cat(' Done!\n')
 
  return(x)
 })
 
-setGeneric('export_package_method', function(x, report_name, template_name, supp = FALSE, dataset = FALSE, add_toc = TRUE) standardGeneric('export_package_method'))
-setMethod('export_package_method', 'ContentPackage', function(x, report_name, template_name, supp = FALSE, dataset = FALSE, add_toc = TRUE) {
+setGeneric('export_report_method', function(x, template_name, supp = FALSE, add_toc = TRUE) standardGeneric('export_report_method'))
+setMethod('export_report_method', 'ContentPackage', function(x, template_name, supp = FALSE, add_toc = TRUE) {
   convert_r_to_txt <- function(input_folder, output_folder) {
     r_files <- list.files(path = input_folder, pattern = "\\.R$", full.names = TRUE)
     for (r_file in r_files) {
       content <- readLines(r_file, warn = FALSE)
 
       file_base <- tools::file_path_sans_ext(basename(r_file))
-      txt_file <- file.path(output_folder, paste0(file_base, ".txt"))
+      txt_file <- file.path(output_folder, paste0(file_base, ".R"))
 
       writeLines(content, txt_file)
     }
   }
 
- cat('  Exporting content package:\n')
+ report_name <- paste0('SAR - ', x@name)
 
- if (dataset) {
-   zipfolder <- here::here('04_Datasets')
+ cat('  Exporting contents:\n')
 
-   unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
-   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
+ zipfolder <- here::here('05_Results')
 
-   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets'))
-   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets', '/', 'programs'))
+ output <- list(
+   dir = tempfile(pattern = format(Sys.time(), "%Y_%m_%d_%H_%M_%S_"))
+ )
+ dir.create(output$dir)
+ dir.create(paste0(output$dir, '/', 'adam'))
+ dir.create(paste0(output$dir, '/', 'adam', '/', 'programs'))
+ dir.create(paste0(output$dir, '/', 'documents'))
+ dir.create(paste0(output$dir, '/', 'documents', '/', 'define'))
+ dir.create(paste0(output$dir, '/', 'tlf'))
+ dir.create(paste0(output$dir, '/', 'tlf', '/', 'rtf'))
 
-   saveRDS(x@content_list, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), ".RDS"))
-   Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), ".RDS"), mode = "0444")
+ unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
+ dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
 
-   convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', sub("^Datasets - ", "", report_name)), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/programs'))
-   convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', sub("^Datasets - ", "", report_name), '/backbones'), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/programs'))
+ types <- sapply(x@content_list, function(x) return(x@type))
+ sections <- sapply(x@content_list, function(x) return(x@section))
+ sections_levels <- unique(sections)
 
-   cat('  Done!\n')
+ content_numbers <- tibble::tibble(ID = seq(1, length(x@content_list)), type = factor(types, levels = c('T', 'F', 'L')), section = factor(sections, levels = sections_levels)) |>
+   dplyr::group_by(type) |>
+   dplyr::group_split() |>
+   lapply(function(type_data) {
+     if (unique(type_data$type) == 'T') start <- x@start_number$T
+     else if (unique(type_data$type) == 'F') start <- x@start_number$F
+     else if (unique(type_data$type) == 'L') start <- x@start_number$L
 
-   cat(paste0('\n\n Datasets avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
+     type_data |>
+       dplyr::mutate(number = seq(start, start + dplyr::n() - 1))
+   }) |>
+   purrr::reduce(dplyr::bind_rows) |>
+   dplyr::mutate(last = ID == dplyr::n()) |>
+   dplyr::arrange(ID)
 
- } else {
-   zipfolder <- here::here('05_Results')
+ sections_start <- content_numbers |>
+   dplyr::group_by(section) |>
+   dplyr::summarise(section_start = min(ID))
 
-   output <- list(
-     dir = tempfile(pattern = format(Sys.time(), "%Y_%m_%d_%H_%M_%S_"))
-   )
-   dir.create(output$dir)
-   dir.create(paste0(output$dir, '/', 'adam'))
-   dir.create(paste0(output$dir, '/', 'adam', '/', 'programs'))
-   dir.create(paste0(output$dir, '/', 'documents'))
-   dir.create(paste0(output$dir, '/', 'documents', '/', 'define'))
-   dir.create(paste0(output$dir, '/', 'tlf'))
-   dir.create(paste0(output$dir, '/', 'tlf', '/', 'rtf'))
+ template_path <- paste0(here::here('00_Template'), '\\', template_name)
 
-   types <- sapply(x@content_list, function(x) return(x@type))
-   sections <- sapply(x@content_list, function(x) return(x@section))
-   sections_levels <- unique(sections)
+ doc <- officer::read_docx(path = template_path)
 
-   content_numbers <- tibble::tibble(ID = seq(1, length(x@content_list)), type = factor(types, levels = c('T', 'F', 'L')), section = factor(sections, levels = sections_levels)) |>
-     dplyr::group_by(type) |>
-     dplyr::group_split() |>
-     lapply(function(type_data) {
-       if (unique(type_data$type) == 'T') start <- x@start_number$T
-       else if (unique(type_data$type) == 'F') start <- x@start_number$F
-       else if (unique(type_data$type) == 'L') start <- x@start_number$L
-
-       type_data |>
-         dplyr::mutate(number = seq(start, start + dplyr::n() - 1))
-     }) |>
-     purrr::reduce(dplyr::bind_rows) |>
-     dplyr::mutate(last = ID == dplyr::n()) |>
-     dplyr::arrange(ID)
-
-   sections_start <- content_numbers |>
-     dplyr::group_by(section) |>
-     dplyr::summarise(section_start = min(ID))
-
-   template_path <- paste0(here::here('00_Template'), '\\', template_name)
-
-   doc <- officer::read_docx(path = template_path)
-
-   if (add_toc) {
-     doc <- doc |>
-       officer::body_add_toc() |>
-       officer::body_add_break()
-   }
-
-   for (i in seq(1, length(x@content_list))) {
-     if (i %in% c(sections_start$section_start)) {
-       if (!is.na(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section))) doc <- officer::body_add_fpar(doc, officer::fpar(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section)), style = 'StatsTLF T\u00edtulo 1')
-       doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
-     } else {
-       doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
-     }
-   }
-   print(doc, target = paste0(output$dir, '/tlf/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'))
-
-   unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
-   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
-
-   files_to_copy <- list.files(output$dir, full.names = TRUE)
-   file.copy(from = files_to_copy, to = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), overwrite = TRUE, recursive = TRUE, copy.mode = TRUE)
-   Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), mode = "0444", use_umask = FALSE)
-
-   cat('  Done!\n')
-
-   cat(paste0('\n\n Report avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
-
-   convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', sub("^SAR - ", "", report_name)), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/adam/programs'))
-   convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', sub("^SAR - ", "", report_name), '/backbones'), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/adam/programs'))
+ if (add_toc) {
+   doc <- doc |>
+     officer::body_add_toc() |>
+     officer::body_add_break()
  }
 
+ for (i in seq(1, length(x@content_list))) {
+   cat('    \u2500 Content', i, '...')
+   if (i %in% c(sections_start$section_start)) {
+     if (!is.na(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section))) doc <- officer::body_add_fpar(doc, officer::fpar(sections_start |> dplyr::filter(section_start == i) |> dplyr::pull(section)), style = 'StatsTLF T\u00edtulo 1')
+     doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
+   } else {
+     doc <- prepare_to_export_method(x@content_list[[i]], content_numbers$number[i], doc, x@sep_subtitle, x@sep_population, output$dir, last = content_numbers$last[i], language = x@language, supp = supp)
+   }
+   cat('  Done!\n')
+ }
+ print(doc, target = paste0(output$dir, '/tlf/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'))
+
+ files_to_copy <- list.files(output$dir, full.names = TRUE)
+ file.copy(from = files_to_copy, to = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), overwrite = TRUE, recursive = TRUE, copy.mode = TRUE)
+ Sys.chmod(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), mode = "0444", use_umask = FALSE)
+
+ cat('  Done!\n')
+
+ cat(paste0('\n\n Report avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
+
+ convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', x@name), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/adam/programs'))
+ convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', x@name, '/backbones'), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/adam/programs'))
+
  return(invisible(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"))))
+})
+
+setGeneric('export_datasets_method', function(x) standardGeneric('export_datasets_method'))
+setMethod('export_datasets_method', 'ContentPackage', function(x) {
+  convert_r_to_txt <- function(input_folder, output_folder) {
+    r_files <- list.files(path = input_folder, pattern = "\\.R$", full.names = TRUE)
+    for (r_file in r_files) {
+      content <- readLines(r_file, warn = FALSE)
+
+      file_base <- tools::file_path_sans_ext(basename(r_file))
+      txt_file <- file.path(output_folder, paste0(file_base, ".R"))
+
+      writeLines(content, txt_file)
+    }
+  }
+
+  report_name <- paste0('Datasets - ', x@name)
+
+  cat('  Exporting datasets:\n')
+
+  zipfolder <- here::here('04_Datasets')
+
+  unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
+  dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
+
+  dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets'))
+  dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets', '/', 'programs'))
+
+  sapply(seq(1, length(x@content_list)), function(i) {
+    cat('    \u2500 Content', i, '...')
+    caux <- x@content_list[[i]]
+    saveRDS(caux@content, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', caux@id, ".RDS"))
+    haven::write_xpt(caux@content, path = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', caux@id, ".xpt"), version = 5)
+    cat('  Done!\n')
+  })
+
+  convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', x@name), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/programs'))
+  convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', x@name, '/backbones'), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/programs'))
+
+  cat('  Done!\n')
+
+  cat(paste0('\n\n Datasets avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
+
+  return(invisible(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"))))
 })

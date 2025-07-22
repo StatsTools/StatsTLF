@@ -1,16 +1,18 @@
-caller_contents <- function(package, backbones) {
+caller_contents <- function(package) {
   ## Use this to debug contents
-  # backbones <- source_backbones()
+  backbones <- source_backbones()
 
-  ## Use this as template for datasets backbones
+  ## Use this as template for input dataset backbones
   # dataset <- StatsTLF::create_content(
+  #   id = '',
   #   content_backbone = backbones,
   #   dataset = tibble::tibble()
   # )@content
 
   contents <- list(
-    ## Use this as template for contents backbones. Add ',' after each content
+    ## Use this as template for output contents backbones. Add ',' after each content
     # StatsTLF::create_content(
+    #   id = '',
     #   content_backbone = backbones,
     #   dataset = tibble::tibble(),
     #   subtitle = NA_character_,

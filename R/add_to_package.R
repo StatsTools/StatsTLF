@@ -1,12 +1,17 @@
-#' Add content to package
+#' Add Content to a Content Package
 #'
-#' @param package An object with class ContentPackage.
-#' @param content An object with class Content.
+#' This function adds content to an existing content package. It requires that the package and content are of specific classes.
 #'
-#' @return A package with content added.
+#' @param package An object of class `ContentPackage`. This represents the package to which content will be added.
+#' @param content An object of class `Content`. This represents the content to be added to the package.
+#'
+#' @return An object of class `ContentPackage` with the new content added.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Create a content package and add content to it
 #' x <- create_content_package() |>
 #'  add_to_package(
 #'   create_content(
@@ -21,11 +26,15 @@
 #'    dataset = tibble::tibble(x = c(1, 2, 3))
 #'   )
 #' )
+#' }
 add_to_package <- function(package, content) {
 
  # Validation Step -------------------------------------------------------------
  stopifnot("`package`must be a ContentPackage object." = class(package) == 'ContentPackage')
  stopifnot("`content`must be a Content object." = class(content) == 'Content')
+
+ ids <- sapply(package@content_list, function(x) x@id)
+ stopifnot('Content `id` must be unique.' = !content@id %in% ids)
  # -----------------------------------------------------------------------------
 
  return(add_to_package_method(x = package, content = content))

@@ -2,21 +2,25 @@
 % Please edit documentation in R/fig_display.R
 \name{fig_display}
 \alias{fig_display}
-\title{Display figure}
+\title{Display Figure}
 \usage{
 fig_display(fig, fdim = list(width = 9, height = 5, dpi = 600))
 }
 \arguments{
-\item{fig}{A ggplot object.}
+\item{fig}{A ggplot object to be displayed.}
 
-\item{fdim}{A list of 3 elements 'width', 'height' and 'dpi', respectively, with 3 numeric values associated. Only used for type = 'F'.}
+\item{fdim}{A list of 3 elements: 'width', 'height', and 'dpi', each with numeric values. The width must be less than or equal to 9, the height must be less than or equal to 5, and the dpi must be greater than or equal to 600.}
 }
 \value{
-A ggplot.
+The original ggplot object.
 }
 \description{
-Display figure
+This function displays a ggplot object using specified dimensions and resolution settings. It saves the plot temporarily and opens it for viewing.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Display a ggplot object with default dimensions
 x <- fig_display(ggplot())
+}
 }

@@ -1,14 +1,20 @@
-#' Create backbone structure folder
+#' Create Backbone Structure Folder
 #'
-#' @param backbone_name A character to specify the name of the backbone.
-#' @param backbone_type A character to specify the type of the backbone. Please use 'T', 'F' or 'L'.
-#' @param pkg_name A character to specify the name of the package.
+#' This function creates a backbone structure folder for a specified package. It requires the name of the backbone, the type of the backbone ('T' for table, 'F' for figure, or 'L' for listing), and the name of the package.
 #'
-#' @return A path to the backbone structure folder
+#' @param backbone_name A character string specifying the name of the backbone.
+#' @param backbone_type A character string specifying the type of the backbone. Please use 'T', 'F', or 'L'.
+#' @param pkg_name A character string specifying the name of the package.
+#'
+#' @return The path to the created backbone structure folder.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Create a backbone structure for a table named 'teste3' in package 'teste2'
 #' create_backbone_structure('teste3', 'T', 'teste2')
+#' }
 create_backbone_structure <- function(backbone_name, backbone_type, pkg_name) {
  stopifnot(
   "`backbone_name` must be provided." = !is.na(backbone_name),

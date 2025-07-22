@@ -1,13 +1,19 @@
-#' Simulate an analysis dataset based on created dataset
+#' Simulate an Analysis Dataset Based on Created Dataset
 #'
-#' @param dataset A tibble created via create_adam_dataset function.
-#' @param n A number with the number of rows to be simulated
+#' This function simulates an analysis dataset by generating random data based on the structure of a given dataset created via the `create_adam_dataset` function.
 #'
-#' @return A tibble with the data simulation.
+#' @param dataset A tibble created via the `create_adam_dataset` function.
+#' @param n A numeric value specifying the number of rows to be simulated.
+#'
+#' @return A tibble containing the simulated data.
 #' @export
 #'
 #' @examples
-#' x <- simulate_adam_dataset(create_adam_dataset('ADSL.xlsx'))
+#' \dontrun{
+#' # Example usage:
+#' # Simulate a dataset with 10 rows based on the structure from 'ADSL.xlsx'
+#' x <- simulate_adam_dataset(create_adam_dataset('ADSL.xlsx'), n = 10)
+#' }
 simulate_adam_dataset <- function(dataset, n = 10) {
 
  # Validation Step -------------------------------------------------------------

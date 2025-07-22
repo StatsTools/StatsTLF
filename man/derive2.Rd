@@ -2,29 +2,29 @@
 % Please edit documentation in R/derive2.R
 \name{derive2}
 \alias{derive2}
-\title{Simplified version of derive function}
+\title{Simplified Version of Derive Function}
 \usage{
-derive2(dataset, var_target, var_source, by = rlang::exprs(USUBJID))
+derive2(.data, var_target, var_source, by = rlang::exprs(USUBJID))
 }
 \arguments{
-\item{dataset}{A data frame (primary dataset) where the variable will be derived}
+\item{.data}{A data frame (primary dataset) where the variable will be derived.}
 
-\item{var_target}{Symbol. Name of the variable to be derived in `dataset`.}
+\item{var_target}{Symbol. Name of the variable to be derived in `.data`.}
 
-\item{var_source}{Symbol. Name of the variable to be used as reference to derive in `dataset`.}
+\item{var_source}{Symbol. Name of the variable to be used as a reference to derive in `.data`.}
 
-\item{by}{Symbol. The subject identifier variable name common to `dataset`.}
+\item{by}{Symbol. The subject identifier variable name common to `.data`.}
 }
 \value{
-The original dataset `dataset` with the variable `var_target` derived accordingly.
+The original dataset `.data` with the variable `var_target` derived accordingly.
 }
 \description{
-Simplified version of derive function to be used in situations where want to convert
-one variable into another with same length of levels.
+This function provides a simplified version of the derive function, intended for use when converting one variable into another with the same length of levels.
 }
 \examples{
 \dontrun{
-adsl <- deriveN(adsl, SEX, SEXN, by = USUBJID)
+# Example usage:
+# Derive variable SEXN from SEX in ADSL dataset
+adsl <- derive2(adsl, SEX, SEXN, by = USUBJID)
 }
-
 }

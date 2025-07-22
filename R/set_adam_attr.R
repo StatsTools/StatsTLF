@@ -1,14 +1,20 @@
-#' Set ADaM attributes for a given dataset and metadata file
+#' Set ADaM Attributes for a Given Dataset and Metadata File
 #'
-#' @param dataset A tibble with the dataset to be compared.
-#' @param path A character to specify the path of the metadata file in .xlsx format based on package template.
-#' @param name A character to specify the name of dataset in the metadata file.
+#' This function sets ADaM attributes for a given dataset based on a specified metadata file. It ensures that the dataset's columns have the correct labels, data types, origins, and levels as defined in the metadata.
 #'
-#' @return A tibble.
+#' @param dataset A tibble containing the dataset to be updated with ADaM attributes.
+#' @param path A character string specifying the path to the metadata file in .xlsx format, based on the package template.
+#' @param name A character string specifying the name of the dataset in the metadata file.
+#'
+#' @return The dataset tibble with updated ADaM attributes.
 #' @export
 #'
 #' @examples
-#' x <- set_adam_attr(dataset, 'ADSL.xlsx')
+#' \dontrun{
+#' # Example usage:
+#' # Set ADaM attributes for a dataset using metadata from 'ADSL.xlsx'
+#' x <- set_adam_attr(dataset, 'ADSL.xlsx', 'ADSL')
+#' }
 set_adam_attr <- function(dataset, path, name) {
   template <- create_adam_dataset(path)
 

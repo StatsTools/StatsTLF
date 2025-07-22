@@ -2,25 +2,29 @@
 % Please edit documentation in R/create_project.R
 \name{create_project}
 \alias{create_project}
-\title{Create project with template}
+\title{Create Project with Template}
 \usage{
 create_project(proj_name, path = NA_character_, open = TRUE, rstudio = TRUE)
 }
 \arguments{
-\item{proj_name}{A character to specify the name of the project.}
+\item{proj_name}{A character string specifying the name of the project.}
 
-\item{path}{A character to specify the path to create the project.}
+\item{path}{A character string specifying the path where the project should be created. If not provided, a directory chooser will be opened.}
 
-\item{open}{A boolean to specify whether the project should be opened.}
+\item{open}{A boolean indicating whether the project should be opened after creation. Defaults to TRUE.}
 
-\item{rstudio}{A boolean to specify whether the rstudio project file should be created.}
+\item{rstudio}{A boolean indicating whether an RStudio project file should be created. Defaults to TRUE.}
 }
 \value{
-A path to the project.
+The path to the created project.
 }
 \description{
-Create project with template
+This function creates a new project with a specified template structure. It sets up directories and template files, and optionally opens the project in RStudio.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Create a project named 'Teste'
 create_project('Teste')
+}
 }

@@ -2,9 +2,10 @@
 % Please edit documentation in R/create_content_package.R
 \name{create_content_package}
 \alias{create_content_package}
-\title{Create content package}
+\title{Create Content Package}
 \usage{
 create_content_package(
+  name,
   start_number = list(T = 1L, F = 1L, L = 1L),
   sep_subtitle = "newline",
   sep_population = "newline",
@@ -12,25 +13,32 @@ create_content_package(
 )
 }
 \arguments{
-\item{start_number}{A list of 3 elements 'T', 'F' and 'L', respectively, with 3 integer values associated.}
+\item{name}{A character string with the name of the package. Must be unique inside 03_Algorithm.}
 
-\item{sep_subtitle}{A character to specify the separator of title and subtitle. Use 'newline' to break a line.}
+\item{start_number}{A list of 3 elements: 'T', 'F', and 'L', each associated with an integer value indicating the starting number for tables, figures, and listings, respectively.}
 
-\item{sep_population}{A character to specify the separator of title or subtitle and population Use 'newline' to break a line.}
+\item{sep_subtitle}{A character string specifying the separator between the title and subtitle. Use 'newline' to insert a line break.}
 
-\item{language}{A character to specify the language of the titles. Use 'PT-BR' or 'EN-US'.}
+\item{sep_population}{A character string specifying the separator between the title or subtitle and the population. Use 'newline' to insert a line break.}
+
+\item{language}{A character string specifying the language of the titles. Use 'PT-BR' for Portuguese or 'EN-US' for English.}
 }
 \value{
-A content package.
+A content package object.
 }
 \description{
-Create content package
+This function creates a content package with specified numbering start points, separators for titles and subtitles, and language settings for the titles.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Create a content package with specific settings
 x <- create_content_package(
+ name = 'Teste',
  start_number = list('T' = 10L, 'F' = 15L, 'L' = 1L),
  sep_subtitle = ', ',
  sep_population = ': ',
  language = 'PT-BR'
 )
+}
 }

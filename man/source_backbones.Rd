@@ -2,19 +2,23 @@
 % Please edit documentation in R/source_backbones.R
 \name{source_backbones}
 \alias{source_backbones}
-\title{Source backbones from backbones folder within a package}
+\title{Source Backbones from Backbones Folder Within a Package}
 \usage{
 source_backbones(pkg_name)
 }
 \arguments{
-\item{pkg_name}{A character to specify the name of the package.}
+\item{pkg_name}{A character string specifying the name of the package.}
 }
 \value{
-A path to the backbone structure folder
+A list of sourced backbones.
 }
 \description{
-Source backbones from backbones folder within a package
+This function sources all backbones from the backbones folder within a specified package, returning the loaded backbones.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Source backbones from the package named 'teste2'
 source_backbones('teste2')
+}
 }

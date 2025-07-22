@@ -1,13 +1,19 @@
-#' Validate a hash SHA1 file given in log file.
+#' Validate a SHA1 Hash for a Given File
 #'
-#' @param hash A character to specify the hash of the file.
-#' @param path A character to specify the path of the file.
+#' This function validates a given SHA1 hash against the actual hash of a specified file, verifying the integrity of the file.
 #'
-#' @return TRUE or FALSE
+#' @param hash A character string specifying the expected SHA1 hash of the file.
+#' @param path A character string specifying the path to the file.
+#'
+#' @return TRUE if the hash matches the file's actual hash; FALSE otherwise.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Validate the hash of a file
 #' x <- validate_hash('abcdkfj28747', './teste/table_teste_backbone.R')
+#' }
 validate_hash <- function(hash, path) {
 
   # Validation Step -------------------------------------------------------------

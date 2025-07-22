@@ -2,21 +2,23 @@
 % Please edit documentation in R/run_caller_contents.R
 \name{run_caller_contents}
 \alias{run_caller_contents}
-\title{Run contents from caller_contents file}
+\title{Run Contents from Caller Contents File}
 \usage{
-run_caller_contents(package, pkg_name)
+run_caller_contents(package)
 }
 \arguments{
-\item{package}{An object with class ContentPackage.}
-
-\item{pkg_name}{A character with the package name.}
+\item{package}{An object of class `ContentPackage`.}
 }
 \value{
-A package with content added.
+The content package with contents added.
 }
 \description{
-Run contents from caller_contents file
+This function executes contents from a specified caller_contents file, adding them to a given content package.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Run contents from the caller_contents file for a specified package
 x <- run_caller_contents(package_init, 'name of the package')
+}
 }

@@ -2,21 +2,25 @@
 % Please edit documentation in R/simulate_adam_dataset.R
 \name{simulate_adam_dataset}
 \alias{simulate_adam_dataset}
-\title{Simulate an analysis dataset based on created dataset}
+\title{Simulate an Analysis Dataset Based on Created Dataset}
 \usage{
 simulate_adam_dataset(dataset, n = 10)
 }
 \arguments{
-\item{dataset}{A tibble created via create_adam_dataset function.}
+\item{dataset}{A tibble created via the `create_adam_dataset` function.}
 
-\item{n}{A number with the number of rows to be simulated}
+\item{n}{A numeric value specifying the number of rows to be simulated.}
 }
 \value{
-A tibble with the data simulation.
+A tibble containing the simulated data.
 }
 \description{
-Simulate an analysis dataset based on created dataset
+This function simulates an analysis dataset by generating random data based on the structure of a given dataset created via the `create_adam_dataset` function.
 }
 \examples{
-x <- simulate_adam_dataset(create_adam_dataset('ADSL.xlsx'))
+\dontrun{
+# Example usage:
+# Simulate a dataset with 10 rows based on the structure from 'ADSL.xlsx'
+x <- simulate_adam_dataset(create_adam_dataset('ADSL.xlsx'), n = 10)
+}
 }

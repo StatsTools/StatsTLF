@@ -2,23 +2,27 @@
 % Please edit documentation in R/set_adam_attr.R
 \name{set_adam_attr}
 \alias{set_adam_attr}
-\title{Set ADaM attributes for a given dataset and metadata file}
+\title{Set ADaM Attributes for a Given Dataset and Metadata File}
 \usage{
 set_adam_attr(dataset, path, name)
 }
 \arguments{
-\item{dataset}{A tibble with the dataset to be compared.}
+\item{dataset}{A tibble containing the dataset to be updated with ADaM attributes.}
 
-\item{path}{A character to specify the path of the metadata file in .xlsx format based on package template.}
+\item{path}{A character string specifying the path to the metadata file in .xlsx format, based on the package template.}
 
-\item{name}{A character to specify the name of dataset in the metadata file.}
+\item{name}{A character string specifying the name of the dataset in the metadata file.}
 }
 \value{
-A tibble.
+The dataset tibble with updated ADaM attributes.
 }
 \description{
-Set ADaM attributes for a given dataset and metadata file
+This function sets ADaM attributes for a given dataset based on a specified metadata file. It ensures that the dataset's columns have the correct labels, data types, origins, and levels as defined in the metadata.
 }
 \examples{
-x <- set_adam_attr(dataset, 'ADSL.xlsx')
+\dontrun{
+# Example usage:
+# Set ADaM attributes for a dataset using metadata from 'ADSL.xlsx'
+x <- set_adam_attr(dataset, 'ADSL.xlsx', 'ADSL')
+}
 }

@@ -1,23 +1,37 @@
-#' Create content package
+#' Create Content Package
 #'
-#' @param start_number A list of 3 elements 'T', 'F' and 'L', respectively, with 3 integer values associated.
-#' @param sep_subtitle A character to specify the separator of title and subtitle. Use 'newline' to break a line.
-#' @param sep_population A character to specify the separator of title or subtitle and population Use 'newline' to break a line.
-#' @param language A character to specify the language of the titles. Use 'PT-BR' or 'EN-US'.
+#' This function creates a content package with specified numbering start points, separators for titles and subtitles, and language settings for the titles.
 #'
-#' @return A content package.
+#' @param name A character string with the name of the package. Must be unique inside 03_Algorithm.
+#' @param start_number A list of 3 elements: 'T', 'F', and 'L', each associated with an integer value indicating the starting number for tables, figures, and listings, respectively.
+#' @param sep_subtitle A character string specifying the separator between the title and subtitle. Use 'newline' to insert a line break.
+#' @param sep_population A character string specifying the separator between the title or subtitle and the population. Use 'newline' to insert a line break.
+#' @param language A character string specifying the language of the titles. Use 'PT-BR' for Portuguese or 'EN-US' for English.
+#'
+#' @return A content package object.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Create a content package with specific settings
 #' x <- create_content_package(
+#'  name = 'Teste',
 #'  start_number = list('T' = 10L, 'F' = 15L, 'L' = 1L),
 #'  sep_subtitle = ', ',
 #'  sep_population = ': ',
 #'  language = 'PT-BR'
 #' )
-create_content_package <- function(start_number = list('T' = 1L, 'F' = 1L, 'L' = 1L), sep_subtitle = 'newline', sep_population = 'newline', language = 'PT-BR') {
+#' }
+create_content_package <- function(name, start_number = list('T' = 1L, 'F' = 1L, 'L' = 1L), sep_subtitle = 'newline', sep_population = 'newline', language = 'PT-BR') {
 
  # Validation Step -------------------------------------------------------------
+ stopifnot(
+   "`name` must be provided." = !is.na(name),
+   "`name` must be a character." = is.character(name),
+   "`name` cannot be an array." = length(name) == 1
+ )
+
  stopifnot(
   "`start_number` must be provided." = !is.na(start_number),
   "`start_number` must be a list." = is.list(start_number),
@@ -46,18 +60,15 @@ create_content_package <- function(start_number = list('T' = 1L, 'F' = 1L, 'L' =
  )
  # -----------------------------------------------------------------------------
 
- cat('  \u2500 Creating content package ...')
-
  content_package <- new(
   'ContentPackage',
+  name = name,
   content_list = list(),
   start_number = start_number,
   sep_subtitle = sep_subtitle,
   sep_population = sep_population,
   language = language
  )
-
- cat(' Done!\n')
 
  return(content_package)
 }

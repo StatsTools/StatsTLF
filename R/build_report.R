@@ -1,14 +1,19 @@
-#' Build a file with log for submission
+#' Build Report Package for Submission
 #'
-#' @param pkg_name A character to specify the name of the package.
-#' @param dataset A boolean to specify if the package is a dataset package, not a report.
+#' This function generates a comprehensive package with log file for a specified report package and the rtfs associated. The log includes session information, backbone file details, and caller content logs. The package name must be provided as a character string, and the corresponding directory must exist in '03_Algorithm'.
 #'
-#' @return path to the log file.
+#' @param pkg_name A character string specifying the name of the package.
+#'
+#' @return The path to the generated folder.
 #' @export
 #'
 #' @examples
-#' x <- build_submission('Teste')
-build_submission <- function(pkg_name, dataset = FALSE) {
+#' \dontrun{
+#' # Example usage:
+#' # Build a log file for the package 'Teste'
+#' x <- build_report('Teste')
+#' }
+build_report <- function(pkg_name) {
 
   # Validation Step -------------------------------------------------------------
   stopifnot(
@@ -20,12 +25,6 @@ build_submission <- function(pkg_name, dataset = FALSE) {
   path <- paste0(path, '\\', pkg_name)
 
   stopifnot("Package name folder doesn't exist in `03_Algorithm`." = dir.exists(path))
-
-  stopifnot(
-    "`dataset` must be provided." = !is.na(dataset),
-    "`dataset` must be a boolean." = is.logical(dataset),
-    "`dataset` cannot be an array." = length(dataset) == 1
-  )
   # -----------------------------------------------------------------------------
 
   zipfolder <- here::here('05_Results')
@@ -34,6 +33,8 @@ build_submission <- function(pkg_name, dataset = FALSE) {
     dir = tempfile(pattern = format(Sys.time(), "%Y_%m_%d_%H_%M_%S_"))
   )
   dir.create(output$dir)
+
+  unlink(paste0(zipfolder, '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
 
   backbone_names <- sub("\\.R$", "", list.files(paste0(path, '\\backbones')))
   backbone_files <- list.files(paste0(path, '\\backbones'), full.names = TRUE)
@@ -100,33 +101,27 @@ build_submission <- function(pkg_name, dataset = FALSE) {
   write('-                               Log Output File                                -', file = log_file, append = TRUE)
   write('--------------------------------------------------------------------------------', file = log_file, append = TRUE)
 
-  if (dataset) {
-    stopifnot('Error generating log. Please check package files.' = file.exists(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.RDS')))
+  stopifnot('Error generating log. Please check package files.' = file.exists(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"))))
 
-    write(paste0('Log File Name: Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), file = log_file, append = TRUE)
-    write(paste0('Log Folder: ', here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets'), file = log_file, append = TRUE)
-    write(paste0('Datasets File HashSum: ', digest::sha1(readLines(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.RDS'), warn = FALSE))), file = log_file, append = TRUE)
-    file.copy(paste0(output$dir, '\\SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
-              paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
-              overwrite = TRUE)
-    Sys.chmod(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), mode = "0444")
+  write(paste0('Log File Name: SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), file = log_file, append = TRUE)
+  write(paste0('Log Folder: ', here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf'), file = log_file, append = TRUE)
+  write(paste0('SAR File HashSum: ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), warn = FALSE))), file = log_file, append = TRUE)
 
-    cat('\n Log file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
+  rtf_files_simp <- list.files(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/rtf'), pattern = "\\.rtf$", full.names = FALSE)
+  rtf_files <- list.files(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/rtf'), pattern = "\\.rtf$", full.names = TRUE)
 
-    return(invisible(paste0(here::here('04_Datasets'), '/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/Datasets - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log')))
-  } else {
-    stopifnot('Error generating log. Please check package files.' = file.exists(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx')))
+  write(paste0('RTF File HashSum:'), file = log_file, append = TRUE)
 
-    write(paste0('Log File Name: SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), file = log_file, append = TRUE)
-    write(paste0('Log Folder: ', here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf'), file = log_file, append = TRUE)
-    write(paste0('SAR File HashSum: ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.docx'), warn = FALSE))), file = log_file, append = TRUE)
-    file.copy(paste0(output$dir, '\\SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
-              paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
-              overwrite = TRUE)
-    Sys.chmod(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), mode = "0444")
+  for (i in seq_along(rtf_files)) {
+    write(paste0('      ', rtf_files_simp[i], ': ', digest::sha1(readLines(rtf_files[i], warn = FALSE))), file = log_file, append = TRUE)
+  }
 
-    cat('\n Log file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
+  file.copy(paste0(output$dir, '\\SAR Log File - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
+            paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'),
+            overwrite = TRUE)
+  Sys.chmod(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), mode = "0444")
+
+  cat('\n Log file HashSum (Save this hash in a safe place!): ', digest::sha1(readLines(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log'), warn = FALSE)))
 
   return(invisible(paste0(here::here('05_Results'), '/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/tlf/SAR - ', pkg_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '.log')))
-  }
 }

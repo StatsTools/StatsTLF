@@ -1,17 +1,23 @@
-#' Create content from content backbone
+#' Create Content from Content Backbone
 #'
-#' @param content_backbone An object with class ContentBackbone.
-#' @param dataset A tibble dataset to apply the content backbone.
-#' @param subtitle A character to specify the content subtitle (optional).
-#' @param population A character to specify the content population (optional).
-#' @param section A character to specify the content section (optional).
-#' @param fdim A list of 3 elements 'width', 'height' and 'dpi', respectively, with 3 numeric values associated. Only used for type = 'F'.
-#' @param ... Extra arguments to pass to 'fun' in content backbone (optional).
+#' This function creates content using a specified content backbone and dataset. Additional parameters allow customization of subtitles, population, section, and dimensions for figures.
 #'
-#' @return A content.
+#' @param id A character string specifying the content id. If Datasets Package, then id will be the name of the exported dataset. Must be unique between contents.
+#' @param content_backbone An object of class `ContentBackbone`.
+#' @param dataset A tibble dataset to which the content backbone will be applied.
+#' @param subtitle A character string specifying the content subtitle (optional).
+#' @param population A character string specifying the content population (optional).
+#' @param section A character string specifying the content section (optional).
+#' @param fdim A list of 3 elements: 'width', 'height', and 'dpi', each with a numeric value. This is only used when the type is 'F' (figure). Max Width, Height: 9 and 5. Min dpi: 600.
+#' @param ... Extra arguments to pass to the 'fun' in the content backbone (optional).
+#'
+#' @return A content object.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Create content from a content backbone with a dataset
 #' x <- create_content(
 #'  create_content_backbone(
 #'   'analysis of dataset',
@@ -23,9 +29,15 @@
 #'  ),
 #'  dataset = tibble::tibble(x = c(1, 2, 3))
 #' )
-create_content <- function(content_backbone, dataset, subtitle = NA_character_, population = NA_character_, section = NA_character_, fdim = list(width = 9, height = 5, dpi = 600), ...) {
+#' }
+create_content <- function(id, content_backbone, dataset, subtitle = NA_character_, population = NA_character_, section = NA_character_, fdim = list(width = 9, height = 5, dpi = 600), ...) {
 
  # Validation Step -------------------------------------------------------------
+  stopifnot(
+    "`id` must be a character." = is.character(id),
+    "`id` cannot be an array." = length(id) == 1
+  )
+
  stopifnot("`content_backbone`must be a ContentBackbone object." = class(content_backbone) == 'ContentBackbone')
 
  stopifnot("`dataset` must be a tibble." = tibble::is_tibble(dataset))
@@ -58,9 +70,12 @@ create_content <- function(content_backbone, dataset, subtitle = NA_character_, 
    "`fdim` must be a list." = is.list(fdim),
    "`fdim` must have 3 elements with names: 'width', 'height' and 'dpi', respectively." = length(fdim) == 3,
    "`fdim` must have 3 elements with names: 'width', 'height' and 'dpi', respectively." = names(fdim) == c('width', 'height', 'dpi'),
-   "`fdim` values must be numeric." = is.numeric(unlist(fdim))
+   "`fdim` values must be numeric." = is.numeric(unlist(fdim)),
+   "`fdim$width` must be less or equal to 9." = fdim$width <= 9,
+   "`fdim$height` must be less or equal to 5." = fdim$height <= 5,
+   "`fdim$dpi` must be greater or equal to 600." = fdim$dpi >= 600
  )
  # -----------------------------------------------------------------------------
 
- return(create_content_method(x = content_backbone, value = value, subtitle = subtitle, population = population, section = section, fdim = fdim, ...))
+ return(create_content_method(x = content_backbone, id = id, value = value, subtitle = subtitle, population = population, section = section, fdim = fdim, ...))
 }

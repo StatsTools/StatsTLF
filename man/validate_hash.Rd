@@ -2,21 +2,25 @@
 % Please edit documentation in R/validate_hash.R
 \name{validate_hash}
 \alias{validate_hash}
-\title{Validate a hash SHA1 file given in log file.}
+\title{Validate a SHA1 Hash for a Given File}
 \usage{
 validate_hash(hash, path)
 }
 \arguments{
-\item{hash}{A character to specify the hash of the file.}
+\item{hash}{A character string specifying the expected SHA1 hash of the file.}
 
-\item{path}{A character to specify the path of the file.}
+\item{path}{A character string specifying the path to the file.}
 }
 \value{
-TRUE or FALSE
+TRUE if the hash matches the file's actual hash; FALSE otherwise.
 }
 \description{
-Validate a hash SHA1 file given in log file.
+This function validates a given SHA1 hash against the actual hash of a specified file, verifying the integrity of the file.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Validate the hash of a file
 x <- validate_hash('abcdkfj28747', './teste/table_teste_backbone.R')
+}
 }

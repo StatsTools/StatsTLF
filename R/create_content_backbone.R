@@ -1,13 +1,18 @@
-#' Create content backbone
+#' Create Content Backbone
 #'
-#' @param title A character to specify the title of the content.
-#' @param type A character to specify the type of the content. Use 'T', 'F' or 'L'.
-#' @param fun A function that creates the content. The return of the function must be a flextable for 'T', ggplot for 'F' and tibble for 'L'.
+#' This function creates a content backbone with a specified title, type, and content-generating function. The type determines the expected return of the function: 'T' for a flextable, 'F' for a ggplot, and 'L' for a tibble.
 #'
-#' @return A content backbone.
+#' @param title A character string specifying the title of the content.
+#' @param type A character string specifying the type of the content. Use 'T', 'F', or 'L'.
+#' @param fun A function that creates the content. The function must return a flextable for 'T', a ggplot for 'F', and a tibble for 'L'.
+#'
+#' @return A content backbone object.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Create a content backbone for a table
 #' x <- create_content_backbone(
 #'  'analysis of dataset',
 #'  'T',
@@ -15,6 +20,7 @@
 #'   dataset |> flextable::flextable()
 #'  }
 #' )
+#' }
 create_content_backbone <- function(title, type, fun) {
 
  # Validation Step -------------------------------------------------------------
@@ -34,11 +40,7 @@ create_content_backbone <- function(title, type, fun) {
  stopifnot("`fun` must be a function." = is.function(fun))
  # -----------------------------------------------------------------------------
 
- cat('  Creating content backbone:', type, '->', title, '...')
-
  content_backbone <- new('ContentBackbone', title = title, type = type, fun = fun)
-
- cat(' Done!\n')
 
  return(content_backbone)
 }

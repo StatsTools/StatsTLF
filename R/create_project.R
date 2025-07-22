@@ -1,15 +1,21 @@
-#' Create project with template
+#' Create Project with Template
 #'
-#' @param proj_name A character to specify the name of the project.
-#' @param path A character to specify the path to create the project.
-#' @param open A boolean to specify whether the project should be opened.
-#' @param rstudio A boolean to specify whether the rstudio project file should be created.
+#' This function creates a new project with a specified template structure. It sets up directories and template files, and optionally opens the project in RStudio.
 #'
-#' @return A path to the project.
+#' @param proj_name A character string specifying the name of the project.
+#' @param path A character string specifying the path where the project should be created. If not provided, a directory chooser will be opened.
+#' @param open A boolean indicating whether the project should be opened after creation. Defaults to TRUE.
+#' @param rstudio A boolean indicating whether an RStudio project file should be created. Defaults to TRUE.
+#'
+#' @return The path to the created project.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Create a project named 'Teste'
 #' create_project('Teste')
+#' }
 create_project <- function(proj_name, path = NA_character_, open = TRUE, rstudio = TRUE) {
  if (is.na(path)) {
     path <- tcltk::tk_choose.dir()
@@ -34,7 +40,7 @@ create_project <- function(proj_name, path = NA_character_, open = TRUE, rstudio
  template_name <- '\\template_PT-BR.docx'
  template_name2 <- '\\template_EN-US.docx'
  template_name3 <- '\\template_spec.xlsx'
- template_name4 <- '\\snippets.R'
+ template_name4 <- '\\snippets.txt'
  template_path <- paste0(template_dir, template_name)
  template_path2 <- paste0(template_dir, template_name2)
  template_path3 <- paste0(template_dir, template_name3)

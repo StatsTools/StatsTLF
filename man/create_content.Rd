@@ -2,9 +2,10 @@
 % Please edit documentation in R/create_content.R
 \name{create_content}
 \alias{create_content}
-\title{Create content from content backbone}
+\title{Create Content from Content Backbone}
 \usage{
 create_content(
+  id,
   content_backbone,
   dataset,
   subtitle = NA_character_,
@@ -15,27 +16,32 @@ create_content(
 )
 }
 \arguments{
-\item{content_backbone}{An object with class ContentBackbone.}
+\item{id}{A character string specifying the content id. If Datasets Package, then id will be the name of the exported dataset. Must be unique between contents.}
 
-\item{dataset}{A tibble dataset to apply the content backbone.}
+\item{content_backbone}{An object of class `ContentBackbone`.}
 
-\item{subtitle}{A character to specify the content subtitle (optional).}
+\item{dataset}{A tibble dataset to which the content backbone will be applied.}
 
-\item{population}{A character to specify the content population (optional).}
+\item{subtitle}{A character string specifying the content subtitle (optional).}
 
-\item{section}{A character to specify the content section (optional).}
+\item{population}{A character string specifying the content population (optional).}
 
-\item{fdim}{A list of 3 elements 'width', 'height' and 'dpi', respectively, with 3 numeric values associated. Only used for type = 'F'.}
+\item{section}{A character string specifying the content section (optional).}
 
-\item{...}{Extra arguments to pass to 'fun' in content backbone (optional).}
+\item{fdim}{A list of 3 elements: 'width', 'height', and 'dpi', each with a numeric value. This is only used when the type is 'F' (figure). Max Width, Height: 9 and 5. Min dpi: 600.}
+
+\item{...}{Extra arguments to pass to the 'fun' in the content backbone (optional).}
 }
 \value{
-A content.
+A content object.
 }
 \description{
-Create content from content backbone
+This function creates content using a specified content backbone and dataset. Additional parameters allow customization of subtitles, population, section, and dimensions for figures.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Create content from a content backbone with a dataset
 x <- create_content(
  create_content_backbone(
   'analysis of dataset',
@@ -47,4 +53,5 @@ x <- create_content(
  ),
  dataset = tibble::tibble(x = c(1, 2, 3))
 )
+}
 }

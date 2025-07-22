@@ -1,32 +1,31 @@
-#' Run contents from caller_contents file
+#' Run Contents from Caller Contents File
 #'
-#' @param package An object with class ContentPackage.
-#' @param pkg_name A character with the package name.
+#' This function executes contents from a specified caller_contents file, adding them to a given content package.
 #'
-#' @return A package with content added.
+#' @param package An object of class `ContentPackage`.
+#'
+#' @return The content package with contents added.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Run contents from the caller_contents file for a specified package
 #' x <- run_caller_contents(package_init, 'name of the package')
-run_caller_contents <- function(package, pkg_name) {
+#' }
+run_caller_contents <- function(package) {
   # Validation Step -------------------------------------------------------------
   stopifnot("`package`must be a ContentPackage object." = class(package) == 'ContentPackage')
-
-  stopifnot(
-    "`pkg_name` must be provided." = !is.na(pkg_name),
-    "`pkg_name` must be a character." = is.character(pkg_name),
-    "`pkg_name` cannot be an array." = length(pkg_name) == 1
-  )
   # -----------------------------------------------------------------------------
+
+  pkg_name <- package@name
 
   path <- here::here('03_Algorithm')
   file_path <- paste0(path, '\\', pkg_name, '\\caller_contents.R')
 
   source(file_path, local = TRUE)
 
-  backbones <- source_backbones(pkg_name)
-
-  package <- caller_contents(package, backbones)
+  package <- caller_contents(package)
 
   return(package)
 }

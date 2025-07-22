@@ -2,24 +2,27 @@
 % Please edit documentation in R/create_content_backbone.R
 \name{create_content_backbone}
 \alias{create_content_backbone}
-\title{Create content backbone}
+\title{Create Content Backbone}
 \usage{
 create_content_backbone(title, type, fun)
 }
 \arguments{
-\item{title}{A character to specify the title of the content.}
+\item{title}{A character string specifying the title of the content.}
 
-\item{type}{A character to specify the type of the content. Use 'T', 'F' or 'L'.}
+\item{type}{A character string specifying the type of the content. Use 'T', 'F', or 'L'.}
 
-\item{fun}{A function that creates the content. The return of the function must be a flextable for 'T', ggplot for 'F' and tibble for 'L'.}
+\item{fun}{A function that creates the content. The function must return a flextable for 'T', a ggplot for 'F', and a tibble for 'L'.}
 }
 \value{
-A content backbone.
+A content backbone object.
 }
 \description{
-Create content backbone
+This function creates a content backbone with a specified title, type, and content-generating function. The type determines the expected return of the function: 'T' for a flextable, 'F' for a ggplot, and 'L' for a tibble.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Create a content backbone for a table
 x <- create_content_backbone(
  'analysis of dataset',
  'T',
@@ -27,4 +30,5 @@ x <- create_content_backbone(
   dataset |> flextable::flextable()
  }
 )
+}
 }

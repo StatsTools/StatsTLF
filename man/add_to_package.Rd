@@ -2,22 +2,25 @@
 % Please edit documentation in R/add_to_package.R
 \name{add_to_package}
 \alias{add_to_package}
-\title{Add content to package}
+\title{Add Content to a Content Package}
 \usage{
 add_to_package(package, content)
 }
 \arguments{
-\item{package}{An object with class ContentPackage.}
+\item{package}{An object of class `ContentPackage`. This represents the package to which content will be added.}
 
-\item{content}{An object with class Content.}
+\item{content}{An object of class `Content`. This represents the content to be added to the package.}
 }
 \value{
-A package with content added.
+An object of class `ContentPackage` with the new content added.
 }
 \description{
-Add content to package
+This function adds content to an existing content package. It requires that the package and content are of specific classes.
 }
 \examples{
+\dontrun{
+# Example usage:
+# Create a content package and add content to it
 x <- create_content_package() |>
  add_to_package(
   create_content(
@@ -32,4 +35,5 @@ x <- create_content_package() |>
    dataset = tibble::tibble(x = c(1, 2, 3))
   )
 )
+}
 }

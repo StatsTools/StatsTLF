@@ -1,26 +1,25 @@
-#' Simplified version of derive function
+#' Simplified Version of Derive Function
 #'
-#' Simplified version of derive function to be used in situations where want to convert
-#' one variable into another with same length of levels.
+#' This function provides a simplified version of the derive function, intended for use when converting one variable into another with the same length of levels.
 #'
-#' @param dataset A data frame (primary dataset) where the variable will be derived
-#' @param var_target Symbol. Name of the variable to be derived in `dataset`.
-#' @param var_source Symbol. Name of the variable to be used as reference to derive in `dataset`.
-#' @param by Symbol. The subject identifier variable name common to `dataset`.
+#' @param .data A data frame (primary dataset) where the variable will be derived.
+#' @param var_target Symbol. Name of the variable to be derived in `.data`.
+#' @param var_source Symbol. Name of the variable to be used as a reference to derive in `.data`.
+#' @param by Symbol. The subject identifier variable name common to `.data`.
 #'
-#' @return
-#' The original dataset `dataset` with the variable `var_target` derived accordingly.
+#' @return The original dataset `.data` with the variable `var_target` derived accordingly.
+#' @export
 #'
 #' @examples
 #' \dontrun{
-#' adsl <- deriveN(adsl, SEX, SEXN, by = USUBJID)
+#' # Example usage:
+#' # Derive variable SEXN from SEX in ADSL dataset
+#' adsl <- derive2(adsl, SEX, SEXN, by = USUBJID)
 #' }
-#'
-#' @export
-derive2 <- function(dataset, var_target, var_source, by = rlang::exprs(USUBJID)) {
-  stopifnot("Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(dataset))
+derive2 <- function(.data, var_target, var_source, by = rlang::exprs(USUBJID)) {
+  stopifnot("Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(.data))
 
-  name <- attr(dataset, 'name')
+  name <- attr(.data, 'name')
 
   var_target_sym <- rlang::ensym(var_target)
   var_source_sym <- rlang::ensym(var_source)
@@ -28,13 +27,13 @@ derive2 <- function(dataset, var_target, var_source, by = rlang::exprs(USUBJID))
   var_target_str <- rlang::as_name(var_target_sym)
   var_source_str <- rlang::as_name(var_source_sym)
 
-  stopifnot(var_source_str %in% names(dataset))
-  stopifnot(var_target_str %in% names(dataset))
+  stopifnot(var_source_str %in% names(.data))
+  stopifnot(var_target_str %in% names(.data))
 
-  src_levels <- levels(dataset[[var_source_str]])
+  src_levels <- levels(.data[[var_source_str]])
   stopifnot('Source variable must be closed.' = !is.null(src_levels))
 
-  tgt_levels <- levels(dataset[[var_target_str]])
+  tgt_levels <- levels(.data[[var_target_str]])
   stopifnot('Target variable must be closed.' = !is.null(tgt_levels))
 
   stopifnot('Levels length of both variables must be the same.' = length(src_levels) == length(tgt_levels))
@@ -52,7 +51,7 @@ derive2 <- function(dataset, var_target, var_source, by = rlang::exprs(USUBJID))
     )
   })
 
-  dataset <- dataset |>
+  .data <- .data |>
     StatsTLF::derive(
       var = !!var_target_sym,
       from = list(),
@@ -61,5 +60,5 @@ derive2 <- function(dataset, var_target, var_source, by = rlang::exprs(USUBJID))
       default = NA
     )
 
-  return(dataset)
+  return(.data)
 }

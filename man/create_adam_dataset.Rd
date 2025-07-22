@@ -2,19 +2,23 @@
 % Please edit documentation in R/create_adam_dataset.R
 \name{create_adam_dataset}
 \alias{create_adam_dataset}
-\title{Create an analysis dataset based on metadata file}
+\title{Create Analysis Dataset}
 \usage{
 create_adam_dataset(path)
 }
 \arguments{
-\item{path}{A character to specify the path of the metadata file in .xlsx format based on package template.}
+\item{path}{A character string specifying the path to the metadata file in .xlsx format.}
 }
 \value{
-A tibble based on metadata file with zero rows
+A list of tibbles, each representing a dataset defined in the metadata file, with zero rows.
 }
 \description{
-Create an analysis dataset based on metadata file
+This function generates an analysis dataset structure with zero rows based on the provided metadata file in .xlsx format. The metadata should follow the package template, including sheets for datasets, variables, and codelists.
 }
 \examples{
-x <- create_adam_dataset('ADSL.xlsx')
+\dontrun{
+# Example usage:
+# Create an analysis dataset structure from 'Spec.xlsx'
+x <- create_adam_dataset('Spec.xlsx')
+}
 }

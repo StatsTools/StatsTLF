@@ -1,12 +1,18 @@
-#' Source backbones from backbones folder within a package
+#' Source Backbones from Backbones Folder Within a Package
 #'
-#' @param pkg_name A character to specify the name of the package.
+#' This function sources all backbones from the backbones folder within a specified package, returning the loaded backbones.
 #'
-#' @return A path to the backbone structure folder
+#' @param pkg_name A character string specifying the name of the package.
+#'
+#' @return A list of sourced backbones.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example usage:
+#' # Source backbones from the package named 'teste2'
 #' source_backbones('teste2')
+#' }
 source_backbones <- function(pkg_name) {
  stopifnot(
   "`pkg_name` must be provided." = !is.na(pkg_name),
@@ -27,6 +33,16 @@ source_backbones <- function(pkg_name) {
  sapply(files.sources, source, local = environment())
 
  backbones <- mget(ls(pattern = "table_|figure_|listing_"))
+
+ lapply(seq_along(backbones), function(i) {
+   bb <- backbones[[i]]
+
+   cat('  \u2500 Content Backbone:\n')
+   cat('    \u2500 Name:', ifelse(is.na(names(backbones)[i]), "", names(backbones)[i]), '\n')
+   cat('    \u2500 Title:', ifelse(is.na(bb@title), "", bb@title), '\n')
+   cat('    \u2500 Type:', ifelse(is.na(bb@type), "", bb@type), '\n')
+   cat('  Done!\n')
+ })
 
  return(backbones)
 }

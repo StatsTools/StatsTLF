@@ -2,19 +2,23 @@
 % Please edit documentation in R/validate_adam_dataset.R
 \name{validate_adam_dataset}
 \alias{validate_adam_dataset}
-\title{Create a report with comparisons against given dataset and metadata file and fix attributes issues}
+\title{Validate ADaM Dataset Against Metadata File}
 \usage{
 validate_adam_dataset(dataset)
 }
 \arguments{
-\item{dataset}{A tibble with the dataset to be compared.}
+\item{dataset}{A tibble containing the dataset to be validated.}
 }
 \value{
-TRUE if dataset validated and FALSE if not.
+TRUE if the dataset is validated successfully; FALSE if there are mismatches.
 }
 \description{
-Create a report with comparisons against given dataset and metadata file and fix attributes issues
+This function validates a dataset by comparing it against a metadata file, checking for structural mismatches and attribute inconsistencies. It reports any issues found and suggests using `set_adam_attr()` to fix missing metadata paths.
 }
 \examples{
-x <- validate_adam_dataset(dataset, 'ADSL.xlsx')
+\dontrun{
+# Example usage:
+# Validate a dataset against the 'ADSL.xlsx' metadata file
+x <- validate_adam_dataset(dataset)
+}
 }
