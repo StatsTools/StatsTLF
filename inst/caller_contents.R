@@ -1,25 +1,13 @@
 caller_contents <- function(package) {
-  ## Use this to debug contents
+  ## Use this to debug contents and get backbones names
   backbones <- source_backbones()
 
-  ## Use this as template for input dataset backbones
-  # dataset <- StatsTLF::create_content(
-  #   id = '',
-  #   content_backbone = backbones,
-  #   dataset = tibble::tibble()
-  # )@content
+  ## Write your input contents here. Add `@content` after the `create_content()` to get the results.
+
 
   contents <- list(
-    ## Use this as template for output contents backbones. Add ',' after each content
-    # StatsTLF::create_content(
-    #   id = '',
-    #   content_backbone = backbones,
-    #   dataset = tibble::tibble(),
-    #   subtitle = NA_character_,
-    #   population = NA_character_,
-    #   section = NA_character_,
-    #   fdim = list(width = 9, height = 5, dpi = 600)
-    # )
+    ## Write your output contents inside this list. Add ',' after each content
+
   )
 
   package <- purrr::reduce(contents, StatsTLF::add_to_package, .init = package)
