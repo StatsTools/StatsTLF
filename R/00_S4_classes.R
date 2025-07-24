@@ -9,11 +9,10 @@ setClass(
 )
 
 # 'ContentBackbone' methods -----------------------------------------------------
-setGeneric('create_content_method', function(x, id, value, subtitle, population, section, fdim, ...) standardGeneric('create_content_method'))
-setMethod('create_content_method', 'ContentBackbone', function(x, id, value, subtitle, population, section, fdim, ...) {
+setGeneric('create_content_method', function(x, value, subtitle, population, section, fdim, export_name, ...) standardGeneric('create_content_method'))
+setMethod('create_content_method', 'ContentBackbone', function(x, value, subtitle, population, section, fdim, export_name, ...) {
 
  cat('  \u2500 Creating content:\n')
- cat('    \u2500 ID:', ifelse(is.na(id), "", id), '\n')
  cat('    \u2500 Type:', ifelse(is.na(x@type), "", x@type), '\n')
  cat('    \u2500 Title:', ifelse(is.na(x@title), "", x@title), '\n')
  cat('    \u2500 Subtitle:', ifelse(is.na(subtitle), "", subtitle), '\n')
@@ -22,14 +21,14 @@ setMethod('create_content_method', 'ContentBackbone', function(x, id, value, sub
 
  content <- new(
   'Content',
-  id = id,
   section = section,
   title = x@title,
   subtitle = subtitle,
   population = population,
   type = x@type,
   content = value,
-  fdim = fdim
+  fdim = fdim,
+  export_name = export_name
  )
 
  cat('  Done!\n')
@@ -62,14 +61,14 @@ if (is.null(getClassDef("flextableORggORtbl_dfORgtable"))) {
 setClass(
  'Content',
  slots = c(
-  id = 'character',
   section = 'character',
   title = 'character',
   subtitle = 'character',
   population = 'character',
   type = 'character',
   content = 'flextableORggORtbl_dfORgtable',
-  fdim = 'list'
+  fdim = 'list',
+  export_name = 'character'
  )
 )
 
@@ -402,10 +401,15 @@ setMethod('export_datasets_method', 'ContentPackage', function(x) {
   dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets', '/', 'programs'))
 
   sapply(seq(1, length(x@content_list)), function(i) {
-    cat('    \u2500 Content', i, '...')
+    cat('    \u2500 Dataset', i, '...')
     caux <- x@content_list[[i]]
-    saveRDS(caux@content, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', caux@id, ".RDS"))
-    haven::write_xpt(caux@content, path = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', caux@id, ".xpt"), version = 5)
+    if (is.na(caux@export_name)) {
+      saveRDS(caux@content, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/adyy', i, ".RDS"))
+      haven::write_xpt(caux@content, path = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/adyy', i, ".xpt"), version = 5)
+    } else {
+      saveRDS(caux@content, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', caux@export_name, ".RDS"))
+      haven::write_xpt(caux@content, path = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', caux@export_name, ".xpt"), version = 5)
+    }
     cat('  Done!\n')
   })
 

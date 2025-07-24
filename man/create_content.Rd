@@ -5,19 +5,17 @@
 \title{Create Content from Content Backbone}
 \usage{
 create_content(
-  id,
   content_backbone,
   dataset,
   subtitle = NA_character_,
   population = NA_character_,
   section = NA_character_,
   fdim = list(width = 9, height = 5, dpi = 600),
+  export_name = NA_character_,
   ...
 )
 }
 \arguments{
-\item{id}{A character string specifying the content id. If Datasets Package, then id will be the name of the exported dataset. Must be unique between contents.}
-
 \item{content_backbone}{An object of class `ContentBackbone`.}
 
 \item{dataset}{A tibble dataset to which the content backbone will be applied.}
@@ -29,6 +27,8 @@ create_content(
 \item{section}{A character string specifying the content section (optional).}
 
 \item{fdim}{A list of 3 elements: 'width', 'height', and 'dpi', each with a numeric value. This is only used when the type is 'F' (figure). Max Width, Height: 9 and 5. Min dpi: 600.}
+
+\item{export_name}{A character string specifying the content export name. Must be unique between contents. If not specified, then a default name to content will be generated "adyyi". Only used for datasets export.}
 
 \item{...}{Extra arguments to pass to the 'fun' in the content backbone (optional).}
 }

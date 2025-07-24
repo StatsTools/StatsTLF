@@ -14,11 +14,11 @@ snippet derive2
 
 snippet create_content
 	StatsTLF::create_content(
-		id = '${1:ID}',
 		content_backbone = backbones,
 		dataset = tibble::tibble(),
 		subtitle = NA_character_,
 		population = NA_character_,
 		section = NA_character_,
-		fdim = list(width = 9, height = 5, dpi = 600)
+		fdim = list(width = 9, height = 5, dpi = 600),
+		export_name = NA_character_
 	)

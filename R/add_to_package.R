@@ -32,9 +32,6 @@ add_to_package <- function(package, content) {
  # Validation Step -------------------------------------------------------------
  stopifnot("`package`must be a ContentPackage object." = class(package) == 'ContentPackage')
  stopifnot("`content`must be a Content object." = class(content) == 'Content')
-
- ids <- sapply(package@content_list, function(x) x@id)
- stopifnot('Content `id` must be unique.' = !content@id %in% ids)
  # -----------------------------------------------------------------------------
 
  return(add_to_package_method(x = package, content = content))

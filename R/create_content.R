@@ -2,13 +2,13 @@
 #'
 #' This function creates content using a specified content backbone and dataset. Additional parameters allow customization of subtitles, population, section, and dimensions for figures.
 #'
-#' @param id A character string specifying the content id. If Datasets Package, then id will be the name of the exported dataset. Must be unique between contents.
 #' @param content_backbone An object of class `ContentBackbone`.
 #' @param dataset A tibble dataset to which the content backbone will be applied.
 #' @param subtitle A character string specifying the content subtitle (optional).
 #' @param population A character string specifying the content population (optional).
 #' @param section A character string specifying the content section (optional).
 #' @param fdim A list of 3 elements: 'width', 'height', and 'dpi', each with a numeric value. This is only used when the type is 'F' (figure). Max Width, Height: 9 and 5. Min dpi: 600.
+#' @param export_name A character string specifying the content export name. Must be unique between contents. If not specified, then a default name to content will be generated "adyyi". Only used for datasets export.
 #' @param ... Extra arguments to pass to the 'fun' in the content backbone (optional).
 #'
 #' @return A content object.
@@ -30,14 +30,9 @@
 #'  dataset = tibble::tibble(x = c(1, 2, 3))
 #' )
 #' }
-create_content <- function(id, content_backbone, dataset, subtitle = NA_character_, population = NA_character_, section = NA_character_, fdim = list(width = 9, height = 5, dpi = 600), ...) {
+create_content <- function(content_backbone, dataset, subtitle = NA_character_, population = NA_character_, section = NA_character_, fdim = list(width = 9, height = 5, dpi = 600), export_name = NA_character_, ...) {
 
  # Validation Step -------------------------------------------------------------
-  stopifnot(
-    "`id` must be a character." = is.character(id),
-    "`id` cannot be an array." = length(id) == 1
-  )
-
  stopifnot("`content_backbone`must be a ContentBackbone object." = class(content_backbone) == 'ContentBackbone')
 
  stopifnot("`dataset` must be a tibble." = tibble::is_tibble(dataset))
@@ -75,7 +70,12 @@ create_content <- function(id, content_backbone, dataset, subtitle = NA_characte
    "`fdim$height` must be less or equal to 5." = fdim$height <= 5,
    "`fdim$dpi` must be greater or equal to 600." = fdim$dpi >= 600
  )
+
+ stopifnot(
+   "`export_name` must be a character." = is.character(export_name),
+   "`export_name` cannot be an array." = length(export_name) == 1
+ )
  # -----------------------------------------------------------------------------
 
- return(create_content_method(x = content_backbone, id = id, value = value, subtitle = subtitle, population = population, section = section, fdim = fdim, ...))
+ return(create_content_method(x = content_backbone, value = value, subtitle = subtitle, population = population, section = section, fdim = fdim, export_name = export_name, ...))
 }

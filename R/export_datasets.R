@@ -35,6 +35,19 @@ export_datasets <- function(package) {
   stopifnot(
     "Folder './04_Datasets' doesn't exist." = dir.exists(here::here('04_Datasets'))
   )
+
+  types <- sapply(package@content_list, function(y) y@type)
+  stopifnot('All contents must have `type` "L".' = all(types == "L"))
+
+  export_names <- sapply(seq_along(package@content_list), function(i) {
+    caux <- package@content_list[[i]]
+    if (is.na(caux@export_name)) {
+      return(paste0('adyy', i))
+    } else {
+      return(caux@export_name)
+    }
+  })
+  stopifnot('Content `export_name` must be unique.' = !any(duplicated(export_names)))
   # -----------------------------------------------------------------------------
 
   return(export_datasets_method(x = package))
