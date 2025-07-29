@@ -54,8 +54,12 @@ if (is.null(getClassDef("gtable"))) {
   setOldClass("gtable")
 }
 
-if (is.null(getClassDef("flextableORggORtbl_dfORgtable"))) {
-  setClassUnion('flextableORggORtbl_dfORgtable', c('flextable', 'gg', 'tbl_df', 'gtable'))
+if (is.null(getClassDef("patchwork"))) {
+  setOldClass("patchwork")
+}
+
+if (is.null(getClassDef("flextableORggORtbl_dfORgtableORpatchwork"))) {
+  setClassUnion('flextableORggORtbl_dfORgtableORpatchwork', c('flextable', 'gg', 'tbl_df', 'gtable', 'patchwork'))
 }
 
 setClass(
@@ -66,7 +70,7 @@ setClass(
   subtitle = 'character',
   population = 'character',
   type = 'character',
-  content = 'flextableORggORtbl_dfORgtable',
+  content = 'flextableORggORtbl_dfORgtableORpatchwork',
   fdim = 'list',
   export_name = 'character'
  )

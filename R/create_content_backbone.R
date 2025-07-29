@@ -4,7 +4,7 @@
 #'
 #' @param title A character string specifying the title of the content.
 #' @param type A character string specifying the type of the content. Use 'T', 'F', or 'L'.
-#' @param fun A function that creates the content. The function must return a flextable for 'T', a ggplot for 'F', and a tibble for 'L'.
+#' @param fun A function that creates the content. The function must return a flextable for 'T', a ggplot or gtable or patchwork for 'F', and a tibble for 'L'.
 #'
 #' @return A content backbone object.
 #' @export

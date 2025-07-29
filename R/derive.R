@@ -81,14 +81,14 @@ derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, defa
     NULL
   }
 
+  datasets_env <- from
+  datasets_env[[main]] <- .data
+
   .data[[var_str]][!is.na(.data[[var_str]])] <- NA
 
   for (case in cases) {
     cond_expr <- rlang::get_expr(case$condition)
     val_expr  <- rlang::get_expr(case$value)
-
-    datasets_env <- from
-    datasets_env[[main]] <- .data
 
     caller_env <- rlang::caller_env()
 
@@ -184,9 +184,6 @@ derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, defa
   }
 
   if (!identical(default, NA)) {
-    datasets_env <- from
-    datasets_env[[main]] <- .data
-
     default_val <- rlang::eval_tidy(rlang::get_expr(default), data = datasets_env, env = caller_env)
 
     if (!all(is.na(.data[[var_str]]))) {

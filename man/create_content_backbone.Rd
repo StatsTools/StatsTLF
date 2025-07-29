@@ -11,7 +11,7 @@ create_content_backbone(title, type, fun)
 
 \item{type}{A character string specifying the type of the content. Use 'T', 'F', or 'L'.}
 
-\item{fun}{A function that creates the content. The function must return a flextable for 'T', a ggplot for 'F', and a tibble for 'L'.}
+\item{fun}{A function that creates the content. The function must return a flextable for 'T', a ggplot or gtable or patchwork for 'F', and a tibble for 'L'.}
 }
 \value{
 A content backbone object.
