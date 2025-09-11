@@ -32,13 +32,12 @@ simulate_adam_dataset <- function(dataset, n = 10) {
   cols <- lapply(names(dataset), function(colname) {
     col <- dataset[[colname]]
 
-    label <- attr(col, 'label')
     data_type <- attr(col, 'data_type')
     origin <- attr(col, 'origin')
-    closed <- attr(col, 'closed')
     levels <- attr(col, 'levels')
+    has_no_data <- attr(col, 'has_no_data')
 
-    is_simulated <- origin == 'Collected'
+    is_simulated <- origin == 'Collected' & has_no_data == 'No'
 
     convert_levels_to_type <- function(levels_vec, data_type) {
       switch(tolower(data_type),
@@ -93,10 +92,6 @@ simulate_adam_dataset <- function(dataset, n = 10) {
       }
     }
 
-    attr(simulated_col, 'label') <- label
-    attr(simulated_col, 'data_type') <- data_type
-    attr(simulated_col, 'origin') <- origin
-    attr(simulated_col, 'closed') <- closed
     attr(simulated_col, 'levels') <- levels
 
     return(simulated_col)
@@ -104,8 +99,7 @@ simulate_adam_dataset <- function(dataset, n = 10) {
 
   simulated_dataset <- tibble::tibble(!!!rlang::set_names(cols, names(dataset)))
 
-  attr(simulated_dataset, "path") <- path
-  attr(simulated_dataset, "name") <- name
+  simulated_dataset <- set_adam_attr(simulated_dataset, path, name)
 
   return(simulated_dataset)
 }

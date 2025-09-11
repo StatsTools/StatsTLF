@@ -28,15 +28,16 @@ set_adam_attr <- function(dataset, path, name) {
   common_cols <- intersect(cols_template, cols_dataset)
 
   for (col in common_cols) {
-    attr(dataset[[col]], "label") <- attr(template[[col]], "label")
-    attr(dataset[[col]], "data_type") <- attr(template[[col]], "data_type")
-    attr(dataset[[col]], "origin") <- attr(template[[col]], "origin")
-    attr(dataset[[col]], "closed") <- attr(template[[col]], "closed")
-    attr(dataset[[col]], "levels") <- attr(template[[col]], "levels")
+    attrs <- attributes(template[[col]])
+    for (att_name in names(attrs)) {
+      attr(dataset[[col]], att_name) <- attrs[[att_name]]
+    }
   }
 
-  attr(dataset, "path") <- attr(template, "path")
-  attr(dataset, "name") <- attr(template, "name")
+  attrs <- attributes(template)
+  for (att_name in names(attrs)) {
+    if (att_name != 'row.names') attr(dataset, att_name) <- attrs[[att_name]]
+  }
 
   return(dataset)
 }
