@@ -99,11 +99,12 @@ describe <- function (x)
         val <- clean_str(method_attrs[[nm]])
         if (!is.null(val)){
 
-          if(stringr::str_sub(val, 1, 2) == "If"){
+
+          if(nm == "description"){
             cli::cli_li(paste0("{.field ", nm, "}: "))
             cat(val)}
 
-          if(stringr::str_sub(val, 1, 2) != "If"){
+          if(nm != "description"){
             cli::cli_li(paste0("{.field ", nm, "}: ",
                                val))}
 
