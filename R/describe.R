@@ -37,7 +37,7 @@ describe <- function(x) {
 
     cli::cli_h1("📊 Dataset Description")
 
-    # Identificação
+    # Identification
     cli::cli_h2("Basic information")
     for (nm in c("path", "name", "label", "class", "subclass", "structure", "repeating", "key_variables", "standard", "has_no_data", "reference_data", "comment")) {
       val <- clean_str(attrs[[nm]])
@@ -70,6 +70,7 @@ describe <- function(x) {
     )
 
     method_attrs <- list(
+      id          = attr(x, "method_id", exact = TRUE),
       name        = attr(x, "method_name", exact = TRUE),
       type        = attr(x, "method_type", exact = TRUE),
       description = attr(x, "method_description", exact = TRUE),
@@ -89,7 +90,7 @@ describe <- function(x) {
 
     cli::cli_h1("🔹 Column Description")
 
-    # Identificação
+    # Identification
     cli::cli_h2("Basic information")
     for (nm in c("order", "dataset", "variable", "label", "data_type", "length", "signif_dig", "format", "mandatory", "closed", "codelist", "origin", "source", "predecessor", "has_no_data", "comment")) {
       val <- clean_str(attrs[[nm]])
@@ -107,12 +108,20 @@ describe <- function(x) {
       cli::cli_alert_info("Value-level metadata available. Check spec.xlsx or define.xml for more information.")
     }
 
-    # Method
+    # Method Information
     if (!all(sapply(method_attrs, is.na))) {
       cli::cli_h2("Method information")
       for (nm in names(method_attrs)) {
         val <- clean_str(method_attrs[[nm]])
-        if (!is.null(val)) cli::cli_li(paste0("{.field ", nm, "}: ", val))
+        if (!is.null(val)) {
+          if (grepl("\n", val, fixed = TRUE)) {
+            indented_val <- paste0('    ', gsub("\n", "\n    ", val))
+            cli::cli_li("{.field {nm}}:")
+            cli::cli_verbatim(indented_val)
+          } else {
+            cli::cli_li(paste0("{.field ", nm, "}: ", val))
+          }
+        }
       }
     }
 

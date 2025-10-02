@@ -71,7 +71,7 @@ create_backbone_structure <- function(backbone_name, backbone_type, pkg_name) {
 
  backbone <- readLines(paste0(backbone_path, "\\", backbone_text, '.R'))
  backbone[28] <- paste0(backbone_text, ' <- StatsTLF::create_content_backbone(title = "", type = "', backbone_type, '", fun = function(dataset, ...) {')
- backbone[67] <- paste0(' return(', backbone_return_text, ')')
+ backbone[53] <- paste0(' return(', backbone_return_text, ')')
 
  if (backbone_type == 'T') {
    backbone[1] <- "#' Title: Create Table – XXXXXXXXXX"

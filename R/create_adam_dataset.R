@@ -133,12 +133,14 @@ create_adam_dataset <- function(path) {
    if (!(is.na(params$method) | length(params$method) == 0)) {
      met_spec <- dplyr::filter(methods_spec, id == params$method)
 
+     attr(col, "method_id") <- ifelse(length(met_spec$id) == 0, NA_character_, met_spec$id)
      attr(col, "method_name") <- ifelse(length(met_spec$name) == 0, NA_character_, met_spec$name)
      attr(col, "method_type") <- ifelse(length(met_spec$type) == 0, NA_character_, met_spec$type)
      attr(col, "method_description") <- ifelse(length(met_spec$description) == 0, NA_character_, met_spec$description)
      attr(col, "method_expression_context") <- ifelse(length(met_spec$`expression context`) == 0, NA_character_, met_spec$`expression context`)
      attr(col, "method_expression_code") <- ifelse(length(met_spec$`expression code`) == 0, NA_character_, met_spec$`expression code`)
    } else {
+     attr(col, "method_id") <- NA_character_
      attr(col, "method_name") <- NA_character_
      attr(col, "method_type") <- NA_character_
      attr(col, "method_description") <- NA_character_

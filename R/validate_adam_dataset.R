@@ -3,6 +3,7 @@
 #' This function validates a dataset by comparing it against a metadata file, checking for structural mismatches and attribute inconsistencies. It reports any issues found and suggests using `set_adam_attr()` to fix missing metadata paths.
 #'
 #' @param dataset A tibble containing the dataset to be validated.
+#' @param print A boolean indicating if validation process should be printed..
 #'
 #' @return TRUE if the dataset is validated successfully; FALSE if there are mismatches.
 #' @export
@@ -13,7 +14,7 @@
 #' # Validate a dataset against the 'ADSL.xlsx' metadata file
 #' x <- validate_adam_dataset(dataset)
 #' }
-validate_adam_dataset <- function(dataset) {
+validate_adam_dataset <- function(dataset, print = TRUE) {
 
   # 0. Check if path metadata is missing
   if (is.null(attr(dataset, "path"))) {
@@ -44,6 +45,13 @@ validate_adam_dataset <- function(dataset) {
   }
   if (length(extra_cols) > 0) {
     issues[["Extra columns"]] <- extra_cols
+  }
+
+  if (length(missing_cols) == 0 & length(extra_cols) == 0 & !identical(cols_dataset, cols_template)) {
+    issues[["Column order mismatch"]] <- list(
+      dataset_order = cols_dataset,
+      template_order = cols_template
+    )
   }
 
   # 2. Compare each comum column
@@ -90,18 +98,22 @@ validate_adam_dataset <- function(dataset) {
   }
 
   if (length(issues) == 0 & length(issues_attr) == 0) {
-    message("✅ No structural mismatches found between dataset and metadata")
+    if (print == TRUE) {
+      message("✅ No structural mismatches found between dataset and metadata")
+    }
     error_trig <- TRUE
   } else {
-    message("⚠️ Structural mismatches found:\n")
-    for (issue in names(issues)) {
-      cat("•", issue, ":\n")
-      print(issues[[issue]])
-      cat("\n")
-    }
-    for (issue_attr in names(issues_attr)) {
-      cat("• Attributes mismatch:", issue_attr, ":", paste(issues_attr[[issue_attr]], collapse = ", "), "\n")
-      cat("\n")
+    if (print == TRUE) {
+      message("⚠️ Structural mismatches found:\n")
+      for (issue in names(issues)) {
+        cat("•", issue, ":\n")
+        print(issues[[issue]])
+        cat("\n")
+      }
+      for (issue_attr in names(issues_attr)) {
+        cat("• Attributes mismatch:", issue_attr, ":", paste(issues_attr[[issue_attr]], collapse = ", "), "\n")
+        cat("\n")
+      }
     }
     error_trig <- FALSE
   }

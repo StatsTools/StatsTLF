@@ -33,7 +33,7 @@ create_datasets_structure <- function(pkg_name) {
   dir.create(paste0(path, '\\backbones'))
 
   caller <- readLines(paste0(path, "\\caller_", pkg_name, '.R'))
-  caller[3] <- paste0("package <- StatsTLF::run_caller_contents(StatsTLF::create_content_package(name = '", pkg_name, "'))")
+  caller[1] <- paste0("package <- StatsTLF::run_caller_contents(StatsTLF::create_content_package(name = '", pkg_name, "'))")
 
   write(caller, file = paste0(path, "\\caller_", pkg_name, '.R'))
 

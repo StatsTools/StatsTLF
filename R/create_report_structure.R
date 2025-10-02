@@ -33,7 +33,7 @@ create_report_structure <- function(pkg_name) {
  dir.create(paste0(path, '\\backbones'))
 
  caller <- readLines(paste0(path, "\\caller_", pkg_name, '.R'))
- caller[4] <- paste0(" name = '", pkg_name, "',")
+ caller[2] <- paste0(" name = '", pkg_name, "',")
 
  write(caller, file = paste0(path, "\\caller_", pkg_name, '.R'))
 

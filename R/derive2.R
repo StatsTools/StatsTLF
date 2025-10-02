@@ -17,8 +17,6 @@
 #' adsl <- derive2(adsl, SEX, SEXN, by = USUBJID)
 #' }
 derive2 <- function(.data, var_target, var_source, by = rlang::exprs(USUBJID)) {
-  stopifnot("Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(.data))
-
   name <- attr(.data, 'name')
 
   var_target_sym <- rlang::ensym(var_target)

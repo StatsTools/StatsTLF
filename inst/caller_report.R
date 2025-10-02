@@ -1,5 +1,3 @@
-library(StatsTLF)
-
 package_init <- StatsTLF::create_content_package(
  name = ,
  start_number = list(T = 1L, F = 1L, L = 1L),

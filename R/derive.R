@@ -38,9 +38,10 @@ derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, defa
   ### Validate Inputs ----------------------------------------------------------
   stopifnot(
     '`var` and `by` cannot be the same variable.' = by_str != var_str,
-    "Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(.data),
+    "Validation error: The dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(.data, print = FALSE),
     "`var` must be a single name or symbol." = rlang::is_symbol(var) || (is.character(var) && length(var) == 1),
     "`var` must exist in .data." = var_str %in% colnames(.data),
+    "`by` must exist in .data." = all(by_str %in% colnames(.data)),
     "`from` must be a list." = is.list(from)
   )
 
@@ -70,6 +71,8 @@ derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, defa
   )
 
   ### Setup Enviromnent --------------------------------------------------------
+  cat('Deriving', var_str, '...')
+
   path <- attr(.data, 'path')
   name <- attr(.data, 'name')
   main <- name
@@ -96,7 +99,7 @@ derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, defa
     matched_ids <- NULL
     for (nm in names(datasets_env)) {
       dataset <- datasets_env[[nm]]
-      if (length(condition_result) == nrow(dataset)) {
+      if (attr(dataset, 'name') == main) {
         if (length(by_str) == 1) {
           ids <- dataset[[by_str]][condition_result]
         } else {
@@ -123,24 +126,50 @@ derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, defa
       val_tmp <- paste0(".val_", var_str)
       src[[val_tmp]] <- value_result
 
-      reduced_values <- src |>
-        dplyr::filter(.data[[by_str]] %in% matched_ids) |>
-        dplyr::group_by(across(all_of(by_str))) |>
-        dplyr::summarise(!!var := dplyr::first(.data[[val_tmp]]), .groups = "drop")
+      if (length(by_str) == 1) {
+        reduced_values <- src |>
+          dplyr::filter(.data[[by_str]] %in% matched_ids) |>
+          dplyr::group_by(across(all_of(by_str))) |>
+          dplyr::summarise(!!var := dplyr::first(.data[[val_tmp]]), .groups = "drop")
+      } else {
+        reduced_values <- src |>
+          dplyr::filter(
+            purrr::reduce(
+              purrr::map2(by_str, matched_ids, ~ src[[.x]] %in% .y),
+              `&`
+            )
+          ) |>
+          dplyr::group_by(across(all_of(by_str))) |>
+          dplyr::summarise(!!var := dplyr::first(.data[[val_tmp]]), .groups = "drop")
+
+        matched_ids <- do.call(paste0, matched_ids)
+        data_ids <- do.call(paste0, .data[, by_str, drop = FALSE])
+      }
 
       value_final <- .data |>
         dplyr::select(by_str) |>
         dplyr::left_join(reduced_values, by = by_str) |>
         dplyr::pull(!!var)
 
-      .data <- .data |>
-        dplyr::mutate(
-          !!var := dplyr::if_else(
-            is.na(.data[[rlang::as_string(var)]]) & .data[[by_str]] %in% matched_ids,
-            value_final,
-            !!var
+      if (length(by_str) == 1) {
+        .data <- .data |>
+          dplyr::mutate(
+            !!var := dplyr::if_else(
+              is.na(.data[[rlang::as_string(var)]]) & .data[[by_str]] %in% matched_ids,
+              value_final,
+              !!var
+            )
           )
-        )
+      } else {
+        .data <- .data |>
+          dplyr::mutate(
+            !!var := dplyr::if_else(
+              is.na(.data[[rlang::as_string(var)]]) & data_ids %in% matched_ids,
+              value_final,
+              !!var
+            )
+          )
+      }
     } else {
       if (!all(is.na(.data[[var_str]]))) {
         existing_type <- typeof(stats::na.omit(.data[[var_str]])[1])
@@ -173,6 +202,7 @@ derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, defa
       } else {
         matched_ids <- do.call(paste0, matched_ids)
         data_ids <- do.call(paste0, .data[, by_str, drop = FALSE])
+
         .data <- .data |>
           dplyr::mutate(
             !!var := dplyr::if_else(
@@ -228,7 +258,7 @@ derive <- function(.data, var, from = list(), cases = list(), by = USUBJID, defa
 
   .data <- set_adam_attr(.data, path, name)
 
-  stopifnot("Validation error: The final dataset does not conform to the defined metadata." = StatsTLF::validate_adam_dataset(.data))
+  stopifnot(StatsTLF::validate_adam_dataset(.data))
 
   return(.data)
 }

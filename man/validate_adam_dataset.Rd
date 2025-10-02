@@ -4,10 +4,12 @@
 \alias{validate_adam_dataset}
 \title{Validate ADaM Dataset Against Metadata File}
 \usage{
-validate_adam_dataset(dataset)
+validate_adam_dataset(dataset, print = TRUE)
 }
 \arguments{
 \item{dataset}{A tibble containing the dataset to be validated.}
+
+\item{print}{A boolean indicating if validation process should be printed..}
 }
 \value{
 TRUE if the dataset is validated successfully; FALSE if there are mismatches.
