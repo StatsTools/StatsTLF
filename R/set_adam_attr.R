@@ -40,8 +40,10 @@ set_adam_attr = function (dataset, path, name)
       }
     }
       
-    
-    
+    attrs <- attributes(template)
+    for (att_name in names(attrs)) {
+      if (att_name != 'row.names') attr(dataset, att_name) <- attrs[[att_name]]
+    }
     
   }
   return(dataset)
