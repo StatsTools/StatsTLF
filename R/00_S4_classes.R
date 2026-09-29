@@ -433,85 +433,232 @@ setMethod('export_report_method', 'ContentPackage', function(x, template_name, s
  return(invisible(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"))))
 })
 
-setGeneric('export_datasets_method', function(x, spec = "") standardGeneric('export_datasets_method'))
-setMethod('export_datasets_method', 'ContentPackage', function(x, spec = "") {
-  convert_r_to_txt <- function(input_folder, output_folder) {
-    r_files <- list.files(path = input_folder, pattern = "\\.R$", full.names = TRUE)
-    for (r_file in r_files) {
-      content <- readLines(r_file, warn = FALSE)
+setGeneric('export_datasets_method', function(x, spec = "", add_csv = TRUE) {
+  standardGeneric('export_datasets_method')
+})
+setMethod(
+  'export_datasets_method',
+  'ContentPackage',
+  function(x, spec = "", add_csv = TRUE) {
+    convert_r_to_txt <- function(input_folder, output_folder) {
+      r_files <- list.files(
+        path = input_folder,
+        pattern = "\\.R$",
+        full.names = TRUE
+      )
+      for (r_file in r_files) {
+        content <- readLines(r_file, warn = FALSE)
 
-      file_base <- tools::file_path_sans_ext(basename(r_file))
-      txt_file <- file.path(output_folder, paste0(file_base, ".R"))
+        file_base <- tools::file_path_sans_ext(basename(r_file))
+        txt_file <- file.path(output_folder, paste0(file_base, ".R"))
 
-      writeLines(content, txt_file)
+        writeLines(content, txt_file)
+      }
     }
-  }
 
-  combine_title <- function(title, subtitle, population, sep_subtitle, sep_population) {
-    fix_sep <- function(sep) ifelse(sep == "newline", " ", sep)
-
-    sep_subtitle <- fix_sep(sep_subtitle)
-    sep_population <- fix_sep(sep_population)
-
-    paste0(
+    combine_title <- function(
       title,
-      ifelse(!is.na(subtitle), paste0(sep_subtitle, subtitle), ""),
-      ifelse(!is.na(population), paste0(sep_population, population), "")
-    )
-  }
+      subtitle,
+      population,
+      sep_subtitle,
+      sep_population
+    ) {
+      fix_sep <- function(sep) ifelse(sep == "newline", " ", sep)
 
-  report_name <- paste0('Datasets - ', x@name)
+      sep_subtitle <- fix_sep(sep_subtitle)
+      sep_population <- fix_sep(sep_population)
 
-  cat('  Exporting datasets:\n')
-
-  zipfolder <- here::here('04_Datasets')
-
-  unlink(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")), recursive = TRUE, force = TRUE)
-  dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
-
-  dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets'))
-  dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'datasets', '/', 'programs'))
-
-  dir.create(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'documents'))
-
-  mapping_list <- list()
-
-  for (i in seq(1, length(x@content_list))) {
-    cat('    \u2500 Dataset', i, '...')
-    caux <- x@content_list[[i]]
-    if (is.na(caux@export_name)) {
-      cname <- paste0('adyy', i)
-    } else {
-      cname <- caux@export_name
+      paste0(
+        title,
+        ifelse(!is.na(subtitle), paste0(sep_subtitle, subtitle), ""),
+        ifelse(!is.na(population), paste0(sep_population, population), "")
+      )
     }
-    saveRDS(caux@content, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', cname, '.RDS'))
-    write.csv(caux@content, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', cname, '.csv'))
+
+    report_name <- paste0('Datasets - ', x@name)
+
+    cat('  Exporting datasets:\n')
+
+    zipfolder <- here::here('04_Datasets')
+
+    unlink(
+      paste0(
+        zipfolder,
+        '/',
+        report_name,
+        ' - ',
+        format(Sys.time(), "%Y-%m-%d")
+      ),
+      recursive = TRUE,
+      force = TRUE
+    )
+    dir.create(paste0(
+      zipfolder,
+      '/',
+      report_name,
+      ' - ',
+      format(Sys.time(), "%Y-%m-%d")
+    ))
+
+    dir.create(paste0(
+      zipfolder,
+      '/',
+      report_name,
+      ' - ',
+      format(Sys.time(), "%Y-%m-%d"),
+      '/',
+      'datasets'
+    ))
+    dir.create(paste0(
+      zipfolder,
+      '/',
+      report_name,
+      ' - ',
+      format(Sys.time(), "%Y-%m-%d"),
+      '/',
+      'datasets',
+      '/',
+      'programs'
+    ))
+
+    dir.create(paste0(
+      zipfolder,
+      '/',
+      report_name,
+      ' - ',
+      format(Sys.time(), "%Y-%m-%d"),
+      '/',
+      'documents'
+    ))
+
+    mapping_list <- list()
+
+    for (i in seq(1, length(x@content_list))) {
+      cat('    \u2500 Dataset', i, '...')
+      caux <- x@content_list[[i]]
+      if (is.na(caux@export_name)) {
+        cname <- paste0('adyy', i)
+      } else {
+        cname <- caux@export_name
+      }
+      saveRDS(
+        caux@content,
+        paste0(
+          zipfolder,
+          '/',
+          report_name,
+          ' - ',
+          format(Sys.time(), "%Y-%m-%d"),
+          '/datasets/',
+          cname,
+          '.RDS'
+        )
+      )
+
+      if (add_csv == TRUE) {
+        write.csv(
+          caux@content,
+          paste0(
+            zipfolder,
+            '/',
+            report_name,
+            ' - ',
+            format(Sys.time(), "%Y-%m-%d"),
+            '/datasets/',
+            cname,
+            '.csv'
+          )
+        )
+      }
+
+      if (spec != '') {
+        mapping_list[[i]] <- tibble::tibble(
+          Display = cname,
+          ID = cname,
+          Documentation = 'Caller Contents File',
+          Title = combine_title(
+            caux@title,
+            caux@subtitle,
+            caux@population,
+            x@sep_subtitle,
+            x@sep_population
+          )
+        ) |>
+          dplyr::bind_cols(mapping_backbone(caux@fun, spec = spec)) |>
+          dplyr::mutate(`Programming Document` = paste0(caux@bk_name, '.R'))
+      }
+
+      cat('  Done!\n')
+    }
 
     if (spec != '') {
-      mapping_list[[i]] <- tibble::tibble(
-        Display = cname,
-        ID = cname,
-        Documentation = 'Caller Contents File',
-        Title = combine_title(caux@title, caux@subtitle, caux@population, x@sep_subtitle, x@sep_population)
-      ) |>
-      dplyr::bind_cols(mapping_backbone(caux@fun, spec = spec)) |>
-      dplyr::mutate(`Programming Document` = paste0(caux@bk_name, '.R'))
+      mapping_tb <- purrr::reduce(
+        mapping_list,
+        dplyr::bind_rows,
+        .init = tibble::tibble(
+          Display = character(),
+          ID = character(),
+          Documentation = character(),
+          Title = character(),
+          Variables = character(),
+          `Programming Context` = character(),
+          `Programming Code` = character()
+        )
+      )
+      writexl::write_xlsx(
+        mapping_tb,
+        paste0(
+          zipfolder,
+          '/',
+          report_name,
+          ' - ',
+          format(Sys.time(), "%Y-%m-%d"),
+          '/',
+          'documents/Mapping Datasets.xlsx'
+        )
+      )
     }
 
+    convert_r_to_txt(
+      paste0(here::here('03_Algorithm'), '/', x@name),
+      paste0(
+        zipfolder,
+        '/',
+        report_name,
+        ' - ',
+        format(Sys.time(), "%Y-%m-%d"),
+        '/datasets/programs'
+      )
+    )
+    convert_r_to_txt(
+      paste0(here::here('03_Algorithm'), '/', x@name, '/backbones'),
+      paste0(
+        zipfolder,
+        '/',
+        report_name,
+        ' - ',
+        format(Sys.time(), "%Y-%m-%d"),
+        '/datasets/programs'
+      )
+    )
+
     cat('  Done!\n')
+
+    cat(paste0(
+      '\n\n Datasets avaliable in: ',
+      zipfolder,
+      '/',
+      report_name,
+      ' - ',
+      format(Sys.time(), "%Y-%m-%d")
+    ))
+
+    return(invisible(paste0(
+      zipfolder,
+      '/',
+      report_name,
+      ' - ',
+      format(Sys.time(), "%Y-%m-%d")
+    )))
   }
-
-  if (spec != '') {
-    mapping_tb <- purrr::reduce(mapping_list, dplyr::bind_rows, .init = tibble::tibble(Display = character(), ID = character(), Documentation = character(), Title = character(), Variables = character(), `Programming Context` = character(), `Programming Code` = character()))
-    writexl::write_xlsx(mapping_tb, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/', 'documents/Mapping Datasets.xlsx'))
-  }
-
-  convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', x@name), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/programs'))
-  convert_r_to_txt(paste0(here::here('03_Algorithm'), '/', x@name, '/backbones'), paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/programs'))
-
-  cat('  Done!\n')
-
-  cat(paste0('\n\n Datasets avaliable in: ', zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d")))
-
-  return(invisible(paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"))))
-})
+)

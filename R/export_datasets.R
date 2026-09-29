@@ -4,6 +4,7 @@
 #'
 #' @param package An object of class `ContentPackage`.
 #' @param spec A character string with path to the spec file.
+#' @param add_csv A boolean indicating whether .csv file should be exported. Defaults to TRUE.
 #'
 #' @return The path to the exported package.
 #' @export
@@ -28,13 +29,19 @@
 #' ) |>
 #' export_package('teste')
 #' }
-export_datasets <- function(package, spec) {
-
+export_datasets <- function(package, spec, add_csv = TRUE) {
   # Validation Step -------------------------------------------------------------
-  stopifnot("Package must contain at least one content to be exported." = length(package@content_list) > 0)
+  stopifnot(
+    "Package must contain at least one content to be exported." = length(
+      package@content_list
+    ) >
+      0
+  )
 
   stopifnot(
-    "Folder './04_Datasets' doesn't exist." = dir.exists(here::here('04_Datasets'))
+    "Folder './04_Datasets' doesn't exist." = dir.exists(here::here(
+      '04_Datasets'
+    ))
   )
 
   stopifnot(
@@ -44,6 +51,12 @@ export_datasets <- function(package, spec) {
   )
 
   stopifnot("Spec not found." = file.exists(spec) | spec == '')
+
+  stopifnot(
+    "`add_csv` must be provided." = !is.na(add_csv),
+    "`add_csv` must be a boolean." = is.logical(add_csv),
+    "`add_csv` cannot be an array." = length(add_csv) == 1
+  )
 
   types <- sapply(package@content_list, function(y) y@type)
   stopifnot('All contents must have `type` "L".' = all(types == "L"))
@@ -56,8 +69,10 @@ export_datasets <- function(package, spec) {
       return(caux@export_name)
     }
   })
-  stopifnot('Content `export_name` must be unique.' = !any(duplicated(export_names)))
+  stopifnot(
+    'Content `export_name` must be unique.' = !any(duplicated(export_names))
+  )
   # -----------------------------------------------------------------------------
 
-  return(export_datasets_method(x = package, spec = spec))
+  return(export_datasets_method(x = package, spec = spec, add_csv = add_csv))
 }
