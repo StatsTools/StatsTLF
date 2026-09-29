@@ -486,7 +486,6 @@ setMethod('export_datasets_method', 'ContentPackage', function(x, spec = "") {
     }
     saveRDS(caux@content, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', cname, '.RDS'))
     write.csv(caux@content, paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', cname, '.csv'))
-    haven::write_xpt(caux@content, path = paste0(zipfolder, '/', report_name, ' - ', format(Sys.time(), "%Y-%m-%d"), '/datasets/', cname, ".xpt"), version = 5)
 
     if (spec != '') {
       mapping_list[[i]] <- tibble::tibble(
